@@ -1,0 +1,31 @@
+{# app/Resources/views/emails/register.html.twig #}
+{% extends 'AnnexTenantBundle::emails/template.html.twig' %}
+
+{% block title %}New account registration.{% endblock %}
+
+{% block heading %}New account registration.{% endblock %}
+
+{% block content %}
+    <table cellpadding="10" cellspacing="0">
+        <tr>
+            <td>Company:</td>
+            <td>{{ company }}</td>
+        </tr>
+        <tr>
+            <td>Name:</td>
+            <td>{{ name }}</td>
+        </tr>
+        <tr>
+            <td>Email address:</td>
+            <td>{{ email }}</td>
+        </tr>
+        <tr>
+            <td>Brightpearl account:</td>
+            <td>{{ brightpearlAccount }}</td>
+        </tr>
+        <tr>
+            <td>Apps:</td>
+            <td>{{ apps }}</td>
+        </tr>
+    </table>
+{% endblock %}

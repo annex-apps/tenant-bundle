@@ -1,0 +1,41 @@
+{# app/Resources/views/emails/welcome.html.twig #}
+{% extends 'AnnexTenantBundle::emails/template.html.twig' %}
+
+{% block title %}Welcome to Annex Apps{% endblock %}
+
+{% block heading %}Welcome to Annex Apps!{% endblock %}
+
+{% block content %}
+
+    We've created an account for you;
+    <br>
+    <br>
+    <table cellpadding="10" cellspacing="0">
+        <tr>
+            <td>Login URL:</td>
+            <td><a href="http://{{ tenantInformation.accountCode }}.annex-apps.com/admin">http://{{ tenantInformation.accountCode }}.annex-apps.com/admin</a></td>
+        </tr>
+        <tr>
+            <td>Email address:</td>
+            <td>{{ email }}</td>
+        </tr>
+        <tr>
+            <td>Password:</td>
+            <td>{{ password }}</td>
+        </tr>
+    </table>
+
+    <br>
+    <p>
+        <strong>You're now ready to install Annex Apps from your Brightpearl App Store.</strong>
+    </p>
+    <br>
+    <p>
+        If you can't see Annex Apps in your Brightpearl account, just fire us an email: help@annex-apps.com
+    </p>
+    <br>
+    <p>
+        Read our <a href="https://annexapps.zendesk.com/hc/en-gb">getting started guides</a>
+    </p>
+
+{% endblock %}

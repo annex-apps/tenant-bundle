@@ -1,0 +1,7 @@
+<div class="navbar-default sidebar" role="navigation">
+    <div class="sidebar-nav navbar-collapse">
+        {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+            {{ include('snippets/admin_nav.html.twig') }}
+        {% endif %}
+    </div>
+</div>

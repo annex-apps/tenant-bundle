@@ -1,0 +1,137 @@
+<?php
+
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * OnHandAlertSent
+ *
+ * @ORM\Table(options={"collate"="utf8mb4_unicode_ci", "charset"="utf8mb4"})
+ * @ORM\Entity(repositoryClass="AppBundle\Entity\WebhookLogRepository")
+ * @ORM\HasLifecycleCallbacks
+ */
+class OnHandAlertSent
+{
+
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="created_at", type="datetime")
+     */
+    private $createdAt;
+
+    /**
+     * @var OnHandAlert
+     *
+     * @ORM\ManyToOne(targetEntity="OnHandAlert")
+     * @ORM\JoinColumn(name="on_hand_alert", referencedColumnName="id", nullable=true)
+     */
+    private $onHandAlert;
+
+    /**
+     * @var WebhookReceived
+     *
+     * @ORM\ManyToOne(targetEntity="WebhookReceived")
+     * @ORM\JoinColumn(name="webhook", referencedColumnName="id", nullable=true)
+     */
+    private $webhook;
+
+    /**
+     * Gets triggered only on insert
+     * @ORM\PrePersist
+     */
+    public function onPrePersist()
+    {
+        $this->setCreatedAt(new \DateTime("now"));
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set createdAt
+     *
+     * @param \DateTime $createdAt
+     *
+     * @return LogEntry
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * Get createdAt
+     *
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Set data
+     *
+     * @param OnHandAlert $onHandAlert
+     *
+     * @return OnHandAlertSent
+     */
+    public function setOnHandAlert($onHandAlert)
+    {
+        $this->onHandAlert = $onHandAlert;
+
+        return $this;
+    }
+
+    /**
+     * Get data
+     *
+     * @return OnHandAlert
+     */
+    public function getOnHandAlert()
+    {
+        return $this->onHandAlert;
+    }
+
+    /**
+     * Set webhook
+     *
+     * @param WebhookReceived $webhookReceived
+     *
+     * @return OnHandAlertSent
+     */
+    public function setWebhook($webhookReceived)
+    {
+        $this->webhook = $webhookReceived;
+
+        return $this;
+    }
+
+    /**
+     * Get data
+     *
+     * @return WebhookReceived
+     */
+    public function getWebhook()
+    {
+        return $this->webhook;
+    }
+}

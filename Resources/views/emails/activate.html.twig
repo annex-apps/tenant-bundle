@@ -1,0 +1,16 @@
+{# app/Resources/views/emails/activate.html.twig #}
+
+{% extends 'AnnexTenantBundle::emails/template.html.twig' %}
+
+{% block title %}Sign up{% endblock %}
+
+{% block heading %}Your Annex Apps account{% endblock %}
+
+{% block content %}
+    <p>
+        Your account is nearly ready ...
+    </p>
+    <p>
+        <a href="{{ activationUrl }}">Click here to activate your Annex Apps account</a>
+    </p>
+{% endblock %}

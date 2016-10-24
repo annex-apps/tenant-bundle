@@ -1,0 +1,45 @@
+{% extends 'AnnexTenantBundle::themes/template.html.twig' %}
+
+{% block heading %}Sign up{% endblock %}
+
+{% block content %}
+
+    {% if app.request.get('accountNotFound') %}
+        <div class="alert alert-warning">
+            Account "{{ app.request.get('accountNotFound') }}" has not yet been set up. Please register below.
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_start(form) }}
+            {{ form_errors(form) }}
+
+            {% if help is defined %}
+                <span class="help">{{ help }}</span>
+            {% endif %}
+
+            {{ form_row(form.company) }}
+            {{ form_row(form.name) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.brightpearlAccount) }}
+            {{ form_row(form.brightpearlDataCentre) }}
+            <br>
+
+            <div class="page-controls">
+                <button type="submit" class="btn btn-success">Create my account</button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    <br>
+    <p>No commitment and no cost until you choose a paid-for plan.</p>
+
+
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}

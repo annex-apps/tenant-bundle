@@ -1,0 +1,28 @@
+{# app/Resources/views/emails/new_user.html.twig #}
+{% extends 'AnnexTenantBundle::emails/template.html.twig' %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block heading %}Welcome to TheLendEngine{% endblock %}
+
+{% block content %}
+    Here is your registration information:
+    <table>
+        <tr>
+            <td>
+                Username:
+            </td>
+            <td>
+                {{ username }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Email address:
+            </td>
+            <td>
+                {{ email }}
+            </td>
+        </tr>
+    </table>
+{% endblock %}

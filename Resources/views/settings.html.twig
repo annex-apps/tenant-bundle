@@ -1,0 +1,54 @@
+{% extends 'AnnexTenantBundle::themes/template.html.twig' %}
+
+{% block heading %}General settings{% endblock %}
+
+
+{% block content %}
+
+    {{ form_start(form) }}
+    {{ form_errors(form) }}
+
+    {% if help is defined %}
+        <span class="help">{{ help }}</span>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-6">
+
+            <h4>Brightpearl account details</h4>
+
+            <p class="small">Get in touch with us if you need to change this.</p>
+
+            <div class="form-group">
+                <label class="control-label">Account code</label>
+                <input class="form-control" type="text" value="{{ tenantInformation.brightpearlAccountCode }}" DISABLED />
+            </div>
+
+            {{ form_row(form.org_country) }}
+            {{ form_row(form.org_timezone) }}
+
+            <br>
+
+        </div>
+
+        <div class="col-md-6">
+            <h4>Contact information</h4>
+            {{ form_row(form.org_name) }}
+            {{ form_row(form.org_email) }}
+            {{ form_row(form.org_cellphone) }}
+        </div>
+
+    </div>
+
+
+    <div class="page-controls">
+        <button type="submit" class="btn btn-success">Save settings</button>
+    </div>
+
+    {{ form_end(form) }}
+
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}

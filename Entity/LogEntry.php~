@@ -1,0 +1,167 @@
+<?php
+
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * LogEntry
+ *
+ * @ORM\Table(options={"collate"="utf8mb4_unicode_ci", "charset"="utf8mb4"})
+ * @ORM\Entity(repositoryClass="AppBundle\Entity\LogEntryRepository")
+ * @ORM\HasLifecycleCallbacks
+ */
+class LogEntry
+{
+
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="created_at", type="datetime")
+     */
+    private $createdAt;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="url", type="string", length=1024)
+     */
+    private $url;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="user_name", type="string", length=1024, nullable=true)
+     */
+    private $userName;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="load_time", type="decimal", scale=2)
+     */
+    private $loadTime;
+
+    /**
+     * Gets triggered only on insert
+     * @ORM\PrePersist
+     */
+    public function onPrePersist()
+    {
+        $this->setCreatedAt(new \DateTime("now"));
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * Set createdAt
+     *
+     * @param \DateTime $createdAt
+     *
+     * @return LogEntry
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * Get createdAt
+     *
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Set url
+     *
+     * @param string $url
+     *
+     * @return LogEntry
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Get url
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * Set user name
+     *
+     * @param string $userName
+     *
+     * @return LogEntry
+     */
+    public function setUserName($userName)
+    {
+        $this->userName = $userName;
+
+        return $this;
+    }
+
+    /**
+     * Get user name
+     *
+     * @return string
+     */
+    public function getUserName()
+    {
+        return $this->userName;
+    }
+
+    /**
+     * Set load time
+     *
+     * @param integer $loadTime
+     *
+     * @return LogEntry
+     */
+    public function setLoadTime($loadTime)
+    {
+        $this->loadTime = $loadTime;
+
+        return $this;
+    }
+
+    /**
+     * Get load time
+     *
+     * @return integer
+     */
+    public function getLoadTime()
+    {
+        return $this->loadTime;
+    }
+}

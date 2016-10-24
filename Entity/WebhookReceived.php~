@@ -1,0 +1,105 @@
+<?php
+
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * WebhookReceived
+ *
+ * @ORM\Table(name="webhook_received", options={"collate"="utf8mb4_unicode_ci", "charset"="utf8mb4"})
+ * @ORM\Entity(repositoryClass="AppBundle\Entity\WebhookReceivedRepository")
+ * @ORM\HasLifecycleCallbacks
+ */
+class WebhookReceived
+{
+
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="created_at", type="datetime")
+     */
+    private $createdAt;
+
+    /**
+     * @var
+     *
+     * @ORM\Column(name="data", type="string", length=1024)
+     */
+    private $data;
+
+    /**
+     * Gets triggered only on insert
+     * @ORM\PrePersist
+     */
+    public function onPrePersist()
+    {
+        $this->setCreatedAt(new \DateTime("now"));
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * Set createdAt
+     *
+     * @param \DateTime $createdAt
+     *
+     * @return LogEntry
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * Get createdAt
+     *
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Set data
+     *
+     * @param string $data
+     *
+     * @return WebhookReceived
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * Get data
+     *
+     * @return string
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+}

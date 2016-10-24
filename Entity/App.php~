@@ -1,0 +1,100 @@
+<?php
+
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * App
+ *
+ * @ORM\Table(name="bz_core.installed_app", options={"collate"="utf8mb4_unicode_ci", "charset"="utf8mb4"})
+ * @ORM\Entity(repositoryClass="AppBundle\Entity\AppRepository")
+ */
+class App
+{
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Tenant")
+     * @ORM\JoinColumn(name="account_id", referencedColumnName="id")
+     */
+    private $account_id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="app_code", type="string", length=255)
+     */
+    private $appCode;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="brightpearl_token", type="string", length=255)
+     */
+    private $brightpearlToken;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="installed_at", type="datetime")
+     */
+    private $installedAt;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="status", type="string", length=255)
+     */
+    private $status = 'TRIAL';
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="plan", type="string", length=128)
+     */
+    private $plan = 'BETA';
+
+    /**
+     * Get id
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set status
+     *
+     * @param string $status
+     *
+     * @return Tenant
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * Get status
+     *
+     * @return string
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+}
