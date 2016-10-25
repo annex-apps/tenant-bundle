@@ -1,7 +1,7 @@
 {
   "name": "annex/tenant-bundle",
   "description": "Bundle for Symfony 3 to handle multi-tenant",
-  "keywords": [""],
+  "keywords": ["annex"],
   "license": "MIT",
   "type": "bundle",
   "authors": [{"name": "Chris Tanner", "email": "chris@annex-apps.com"}],
@@ -18,7 +18,7 @@
   },
   "extra" : {
     "branch-alias" : {
-      "dev-master" : "1.0"
+      "dev-master" : "1.0-dev"
     }
   }
 }
