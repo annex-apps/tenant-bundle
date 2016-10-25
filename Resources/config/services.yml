@@ -25,13 +25,6 @@ services:
         arguments:
             - "@doctrine.orm.entity_manager"
 
-    annex_tenant.fos_user_mailer:
-        class: Annex\TenantBundle\Mailer\FOSMailer
-        arguments:
-            - "@service_container"
-            - "@twig"
-            - "@router"
-
     doctrine.dbal.connection_factory:
         class: Annex\TenantBundle\Account\CustomConnectionFactory
         arguments:

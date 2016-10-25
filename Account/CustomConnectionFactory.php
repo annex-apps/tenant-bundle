@@ -162,7 +162,7 @@ class CustomConnectionFactory extends ConnectionFactory
             return 'yosemite';
         }
 
-        // Get account from subdomain
+        // Get account from subdomain (will not return anything when called from command line)
         if (isset($_SERVER['HTTP_HOST'])) {
             $d = explode(".",$_SERVER['HTTP_HOST']);
             if ($d[0] != 'localhost:8000') {
