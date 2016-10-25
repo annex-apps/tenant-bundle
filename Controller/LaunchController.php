@@ -21,14 +21,11 @@ class LaunchController extends Controller
 {
 
     /**
-     * Need to clear the cache due strange Heroku behaviour where not all proxies come up with wake-up
      * @Route("update", name="auto_update")
      */
     public function updateDatabase(Request $request)
     {
-        // Make any DB updates required
         $this->updateSchema();
-
         return $this->redirect($this->generateUrl('settings'));
     }
 
@@ -36,7 +33,7 @@ class LaunchController extends Controller
      * Signup is required before launch to create an empty database and entry in tenant
      * @Route("launch", name="launch")
      */
-    public function deployNewDatabase(Request $request)
+    public function launchTenant(Request $request)
     {
 
         $accountCode = preg_replace("/[^a-z0-9]+/i", "", strtolower($request->get('accountCode')));
@@ -62,6 +59,7 @@ class LaunchController extends Controller
         }
 
         $tenant->setBrightpearlToken($token);
+        $tenant->setStatus('TRIAL');
         $em->persist($tenant);
 
         try {
@@ -75,11 +73,17 @@ class LaunchController extends Controller
 
             $this->sendActivationEmail($tenant);
 
-        } catch (\Exception $e) {
+            if ($this->getParameter("kernel.environment") == 'prod') {
+                return $this->redirect("http://{$accountCode}.{$appDomain}/login?launched=1");
+            } else {
+                return $this->redirect("http://localhost:8000/login?launched=1");
+            }
 
+        } catch (\Exception $e) {
+            die($e->getMessage());
         }
 
-        return $this->redirect("http://{$accountCode}.{$appDomain}/login?launched=1");
+
     }
 
     /**
@@ -89,7 +93,7 @@ class LaunchController extends Controller
 
         try {
 
-            $client = new PostmarkClient($this->getParameter('postmark_api_key'));
+            $client = new PostmarkClient($this->getParameter('annex.postmark_api_key'));
             $message = $this->renderView(
                 'emails/basic.html.twig',
                 [
@@ -127,16 +131,18 @@ class LaunchController extends Controller
         $user->addRole("ROLE_SUPER_USER");
         $user->setEnabled(true);
 
-        $pass  = $this->generatePassword();
+        if ($this->getParameter("kernel.environment") == 'prod') {
+            $pass = $this->generatePassword();
+        } else {
+            $pass = 'test123';
+        }
         $user->setPlainPassword($pass);
-
-        $this->addFlash('success', $pass);
 
         // Send the password to admin
         try {
-            $client = new PostmarkClient($this->getParameter('postmark_api_key'));
+            $client = new PostmarkClient($this->getParameter('annex.postmark_api_key'));
             $message = $this->renderView(
-                'TenantBundle::emails/welcome.html.twig',
+                'AnnexTenantBundle::emails/welcome.html.twig',
                 [
                     'email'    => 'admin@annex-apps.com',
                     'password' => $pass
@@ -192,9 +198,9 @@ class LaunchController extends Controller
         $em->flush();
 
         try {
-            $client = new PostmarkClient($this->getParameter('postmark_api_key'));
+            $client = new PostmarkClient($this->getParameter('annex.postmark_api_key'));
             $message = $this->renderView(
-                'TenantBundle::emails/welcome.html.twig',
+                'AnnexTenantBundle::emails/welcome.html.twig',
                 [
                     'email' => $email,
                     'password' => $pass
@@ -257,9 +263,9 @@ class LaunchController extends Controller
     public function welcomeTest()
     {
         try {
-            $client = new PostmarkClient($this->getParameter('postmark_api_key'));
+            $client = new PostmarkClient($this->getParameter('annex.postmark_api_key'));
             $message = $this->renderView(
-                'TenantBundle::emails/welcome.html.twig',
+                'AnnexTenantBundle::emails/welcome.html.twig',
                 [
                     'email' => 'hello@annex-apps.com',
                     'password' => 'testpass'

@@ -88,7 +88,6 @@ class SignupController extends Controller
                         $activationUrl = 'http://'.$appDomain.'/launch?accountCode='.$subDomain;
                     }
 
-                    // Send email to user
                     $this->sendActivationEmail($activationUrl, $toEmail);
 
                     // Send email to admin
@@ -138,9 +137,9 @@ class SignupController extends Controller
     {
 
         try {
-            $client = new PostmarkClient($this->getParameter('postmark_api_key'));
+            $client = new PostmarkClient($this->getParameter('annex.postmark_api_key'));
             $message = $this->renderView(
-                'TenantBundle::emails/activate.html.twig',
+                'AnnexTenantBundle::emails/activate.html.twig',
                 [
                     'activationUrl' => $activationUrl
                 ]
@@ -162,9 +161,9 @@ class SignupController extends Controller
     private function sendAdminEmail($activationUrl, $domain, $email)
     {
         try {
-            $client = new PostmarkClient($this->getParameter('postmark_api_key'));
+            $client = new PostmarkClient($this->getParameter('annex.postmark_api_key'));
             $message = $this->renderView(
-                'TenantBundle::emails/activate.html.twig',
+                'AnnexTenantBundle::emails/activate.html.twig',
                 [
                     'activationUrl' => $activationUrl
                 ]

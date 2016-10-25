@@ -51,7 +51,7 @@ class FOSMailer implements MailerInterface
 
         $toEmail = $user->getEmail();
 
-        $client = new PostmarkClient($this->container->getParameter('postmark_api_key'));
+        $client = new PostmarkClient($this->container->getParameter('annex_postmark_api_key'));
         $client->sendEmail(
             "{$fromCompanyName} <system@annex-apps.com>",
             $toEmail,
@@ -85,7 +85,7 @@ class FOSMailer implements MailerInterface
 
         $toEmail = $user->getEmail();
 
-        $client = new PostmarkClient($this->container->getParameter('postmark_api_key'));
+        $client = new PostmarkClient($this->container->getParameter('annex_postmark_api_key'));
         $client->sendEmail(
             "{$fromCompanyName} <system@annex-apps.com>",
             $toEmail,

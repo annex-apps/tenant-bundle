@@ -30,9 +30,9 @@ class Utility
      */
     public function getBrightpearlToken($brightpearlAccountCode) {
 
-        if ($this->container->getParameter('kernel.environment') == 'dev') {
-            return 'token';
-        }
+//        if ($this->container->getParameter('kernel.environment') == 'dev') {
+//            return 'token';
+//        }
 
         if ($installedAccounts = $this->getInstalledAccounts()) {
             foreach ($installedAccounts AS $account) {

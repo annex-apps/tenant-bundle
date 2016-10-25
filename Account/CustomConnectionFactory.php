@@ -26,28 +26,22 @@ class CustomConnectionFactory extends ConnectionFactory
     function __construct(Session $session)
     {
 
-        $this->session = $session;
+        $this->session  = $session;
 
-        $connectionFound = false;
+        // the name of the DB that holds the tenant table
+        $this->database = 'notifier_core';
 
-        // Production
-        $url = getenv('RDS_URL');
-        if ($url) {
+        if ($url = getenv('RDS_URL')) {
+            // Production
             $dbparts = parse_url($url);
             $this->server   = $dbparts['host'];
             $this->username = $dbparts['user'];
             $this->password = $dbparts['pass'];
-            $this->database = 'notifier_core';
-            $connectionFound = true;
-        }
-
-        // Dev
-        // @todo put this into a dev ENV var
-        if ($connectionFound == false) {
+        } else if (getenv('DEV_DB_USER')) {
+            // Dev
             $this->server   = '127.0.0.1';
-            $this->database = 'notifier_core';
-            $this->username = 'reuse';
-            $this->password = 'pass';
+            $this->username = getenv('DEV_DB_USER');
+            $this->password = getenv('DEV_DB_PASS');
         }
 
         if (!$this->server || !$this->username || !$this->password) {
@@ -157,16 +151,13 @@ class CustomConnectionFactory extends ConnectionFactory
             return $_REQUEST['account'];
         }
 
-        if (isset($_GET['accountCode']) && $_GET['accountCode']) {
-            // AJAX call to a common app domain from a user script
-            return $_REQUEST['accountCode'];
-        }
-
         if (isset($_GET['state']) && $_GET['state']) {
             // We're coming back from Stripe.com oAuth into the HTTPS Heroku domain so we don't have a subdomain
             return $_REQUEST['state'];
         }
 
+        // Comment out this section to test the signup process on dev
+        // When you receive the activation email, un-comment this section and then click the link to activate
         if (getenv('SYMFONY_ENV') != 'prod') {
             return 'yosemite';
         }

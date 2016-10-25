@@ -2,3 +2,74 @@ services:
 #    annex_tenant.example:
 #        class: Annex\TenantBundle\Example
 #        arguments: ["@service_id", "plain_value", "%parameter%"]
+
+    twig.extension.tenant_information:
+        class: Annex\TenantBundle\Extensions\TenantInformationExtension
+        arguments:
+            - "@annex_tenant.tenant_information"
+        tags:
+            - { name: twig.extension }
+
+#### SERVICES REQUIRED BY [MODIFIED] DEPENDENCIES ####
+
+    app.form.registration:
+        class: Annex\TenantBundle\Form\RegistrationType
+        arguments: ['@service_container']
+        tags:
+            - { name: form.type, alias: app_user_registration }
+
+#### ANNEX CORE SERVICES ####
+
+    annex_tenant.settings:
+        class: Annex\TenantBundle\Services\Settings
+        arguments:
+            - "@doctrine.orm.entity_manager"
+
+    annex_tenant.fos_user_mailer:
+        class: Annex\TenantBundle\Mailer\FOSMailer
+        arguments:
+            - "@service_container"
+            - "@twig"
+            - "@router"
+
+    doctrine.dbal.connection_factory:
+        class: Annex\TenantBundle\Account\CustomConnectionFactory
+        arguments:
+            - "@session"
+
+    annex_tenant.tenant_information:
+        class: Annex\TenantBundle\Extensions\TenantInformation
+        arguments:
+            - "@session"
+            - "@service_container"
+
+    twigdate.listener.request:
+        class: Annex\TenantBundle\Services\TwigDateRequestListener
+        arguments:
+            - "@twig"
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+#### BRIGHTPEARL HELPER SERVICES ####
+# Allows us to change the API client without changing any other code #
+
+    service.brightpearl.contact:
+        class: Annex\TenantBundle\Services\Brightpearl\Contact
+        arguments:
+            - "@service_container"
+            - "@annex_tenant.tenant_information"
+            - "@annex_tenant.settings"
+
+    service.brightpearl.order:
+        class: Annex\TenantBundle\Services\Brightpearl\Order
+        arguments:
+            - "@service_container"
+            - "@annex_tenant.tenant_information"
+            - "@annex_tenant.settings"
+
+    service.brightpearl.utility:
+        class: Annex\TenantBundle\Services\Brightpearl\Utility
+        arguments:
+            - "@service_container"
+            - "@annex_tenant.tenant_information"
+            - "@doctrine.orm.entity_manager"

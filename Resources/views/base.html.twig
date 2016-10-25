@@ -101,7 +101,41 @@
     <!-- /.container-fluid -->
 </nav>
 
-{% block body %}{% endblock %}
+<section id="user">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3" style="min-height: 600px">
+                {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                    {{ include('AnnexTenantBundle::snippets/admin_nav.html.twig') }}
+                {% endif %}
+            </div>
+            <div class="col-md-9">
+                <h1 class="page-header">{% block heading %}Page heading{% endblock %}</h1>
+
+                {% for flash_message in app.session.flashbag.get('success-inline') %}
+                    <div class="alert alert-success">
+                        {{ flash_message }}
+                    </div>
+                {% endfor %}
+
+                {% for flash_message in app.session.flashbag.get('error-inline') %}
+                    <div class="alert alert-danger">
+                        {{ flash_message }}
+                    </div>
+                {% endfor %}
+
+                {% for flash_message in app.session.flashbag.get('debug') %}
+                    <div class="alert alert-info">
+                        <pre>{{ flash_message }}</pre>
+                    </div>
+                {% endfor %}
+
+                {% block content %}{% endblock %}
+
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Footer -->
 <footer class="text-center">

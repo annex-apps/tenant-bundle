@@ -25,22 +25,7 @@ class DefaultController extends Controller
     public function dashboardAction(Request $request)
     {
         return $this->render('AnnexTenantBundle::dash.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..')
-        ]);
-    }
 
-    /**
-     * @Route("/admin/users", name="user_list")
-     */
-    public function userListAction()
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        /** @var \Annex\TenantBundle\Repository\ContactRepository $contactRepo */
-        $contactRepo = $em->getRepository('AnnexTenantBundle:Contact');
-
-        return $this->render('AnnexTenantBundle::users.html.twig', [
-            'users' => $contactRepo->findAll()
         ]);
     }
 
