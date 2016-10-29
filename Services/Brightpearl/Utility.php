@@ -2,8 +2,7 @@
 
 namespace Annex\TenantBundle\Services\Brightpearl;
 
-use Annex\TenantBundle\Entity\App;
-use Annex\TenantBundle\Extensions\TenantInformation;
+use Annex\TenantBundle\Services\Tenant;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -11,16 +10,16 @@ class Utility
 {
 
     private $container;
-    private $tenantInformation;
+    private $tenant;
     private $em;
 
     public $errors   = [];
     public $messages = [];
 
-    public function __construct(Container $container, TenantInformation $tenantInformation, EntityManager $em)
+    public function __construct(Container $container, Tenant $tenant, EntityManager $em)
     {
         $this->container = $container;
-        $this->tenantInformation = $tenantInformation;
+        $this->tenant = $tenant;
         $this->em = $em;
     }
 
@@ -48,65 +47,28 @@ class Utility
     /**
      * @return bool
      */
-//    public function activateApp()
-//    {
-//        /** @var \Annex\TenantBundle\Entity\TenantRepository $tenantRepo */
+    public function unInstallApp()
+    {
+
+//        /** @var \Annex\TenantBundle\Repository\TenantRepository $tenantRepo */
 //        $tenantRepo = $this->em->getRepository('AnnexTenantBundle:Tenant');
 //
-//        // Account code comes from domain stub
-//        $brightpearlAccountCode = $this->tenantInformation->getBrightpearlAccountCode();
+//        $brightpearlAccountCode = $this->tenant->getBrightpearlAccountCode();
 //
 //        /** @var $tenant \Annex\TenantBundle\Entity\Tenant */
 //        if (!$tenant = $tenantRepo->findOneBy(['brightpearlAccountCode' => $brightpearlAccountCode])) {
 //            return false;
 //        }
 //
-//        // Install : update the tenant details with Brightpearl token
-//        if ($installedAccounts = $this->getInstalledAccounts()) {
-//            foreach ($installedAccounts AS $account) {
-//                if ($account->accountCode == $brightpearlAccountCode) {
-//                    $token = $account->unsignedAccountToken;
+//        $tenant->setStatus('UNINSTALLED');
 //
-//                    $tenant->setBrightpearlToken($token);
-//                    $this->em->persist($tenant);
+//        try {
+//            $this->em->flush();
+//        } catch (\Exception $e) {
 //
-//                    try {
-//                        $this->em->flush();
-//                    } catch (\Exception $e) {
-//
-//                    }
-//                }
-//            }
 //        }
 //
 //        return true;
-//    }
-
-    /**
-     * @return bool
-     */
-    public function unInstallApp()
-    {
-
-        /** @var \Annex\TenantBundle\Entity\TenantRepository $tenantRepo */
-        $tenantRepo = $this->em->getRepository('AnnexTenantBundle:Tenant');
-
-        $brightpearlAccountCode = $this->tenantInformation->getBrightpearlAccountCode();
-
-        /** @var $tenant \Annex\TenantBundle\Entity\Tenant */
-        if (!$tenant = $tenantRepo->findOneBy(['brightpearlAccountCode' => $brightpearlAccountCode])) {
-            return false;
-        }
-
-        $tenant->setStatus('UNINSTALLED');
-
-        try {
-            $this->em->flush();
-        } catch (\Exception $e) {
-
-        }
-
-        return true;
 
     }
 

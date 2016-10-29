@@ -2,7 +2,7 @@
 
 namespace Annex\TenantBundle\Services\Brightpearl;
 
-use Annex\TenantBundle\Extensions\TenantInformation;
+use Annex\TenantBundle\Services\Tenant;
 use Annex\TenantBundle\Services\Settings;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\Container;
@@ -11,7 +11,7 @@ class Order
 {
 
     private $container;
-    private $tenantInformation;
+    private $tenant;
     private $settings;
     private $brightpearlAccountCode;
     private $brightpearlAccountVersion = '0';
@@ -20,10 +20,10 @@ class Order
 
     public $errors = [];
 
-    public function __construct(Container $container, TenantInformation $tenantInformation, Settings $settings)
+    public function __construct(Container $container, Tenant $tenant, Settings $settings)
     {
         $this->container = $container;
-        $this->tenantInformation = $tenantInformation;
+        $this->tenant = $tenant;
         $this->settings = $settings;
     }
 
@@ -671,10 +671,9 @@ class Order
      */
     private function getBrightpearlClient()
     {
-        $installedApps                 = $this->tenantInformation->getInstalledApps();
-        $this->brightpearlAccountCode  = $this->tenantInformation->getBrightpearlAccountCode();
-        $this->brightpearlDataCentre   = $this->tenantInformation->getBrightpearlDataCentre();
-        $brightpearlAccountToken = $installedApps['zendesk']['brightpearl_token'];
+        $this->brightpearlAccountCode  = $this->tenant->getBrightpearlAccountCode();
+        $this->brightpearlDataCentre   = $this->tenant->getBrightpearlDataCentre();
+        $brightpearlAccountToken       = $this->tenant->getBrightpearlToken();
 
         if ($this->brightpearlAccountCode && $this->brightpearlDataCentre) {
 

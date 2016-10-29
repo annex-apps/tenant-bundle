@@ -30,7 +30,7 @@ class Settings
         if ($key && isset($this->settings[$key])) {
             return $this->settings[$key];
         } else {
-            /** @var $repo \Annex\TenantBundle\Entity\SettingRepository */
+            /** @var $repo \Annex\TenantBundle\Repository\SettingRepository */
             $repo =  $this->em->getRepository('AnnexTenantBundle:Setting');
             if ($setting = $repo->findOneBy(['setupKey' => $key])) {
                 $this->settings[$key] = $setting->getSetupValue();

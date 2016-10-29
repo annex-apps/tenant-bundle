@@ -35,8 +35,8 @@ class SettingsType extends AbstractType
         ];
 
         // Get the settings
-        /** @var $repo \Annex\TenantBundle\Entity\SettingRepository */
-        $repo =  $this->em->getRepository('AnnexTenantBundle:Setting');
+        /** @var $repo \Annex\TenantBundle\Repository\SettingRepository */
+        $repo =  $this->em->getRepository('Annex\TenantBundle\Entity\Setting');
         $dbData = $repo->getAllSettings();
 
         $builder->add('org_timezone', TimezoneType::class, array(

@@ -62,26 +62,12 @@ class CustomConnectionFactory extends ConnectionFactory
         if ($account_code = $this->determineAccountCode()) {
 
             if ($result = $this->getAccountInformation($account_code)) {
-
-                $account_name       = $result[0]['name'];
-
                 // Switch to use the tenant DB
                 $this->database     = $result[0]['db_schema'];
                 $this->accountId    = $result[0]['id'];
 
-                // Session information is used to set container parameters in TenantInformationExtension
-                $this->session->set('account_id', $this->accountId);
-                $this->session->set('account_code', $account_code);
-                $this->session->set('account_name', $account_name);
-                $this->session->set('account_owner_name', $result[0]['owner_name']);
-                $this->session->set('account_owner_email', $result[0]['owner_email']);
-                $this->session->set('account_status', $result[0]['status']);
-
-                // Brightpearl data. Account code is usually the same as Annex account code but doesn't have to be
-                $this->session->set('brightpearl_account_code', $result[0]['brightpearl_account_code']);
-                $this->session->set('brightpearl_data_centre', $result[0]['brightpearl_data_centre']);
-                $this->session->set('brightpearl_token', $result[0]['brightpearl_token']);
-
+                // All the tenant info in session so we don't need to connect again downstream
+                $this->session->set('tenant', serialize($result[0]));
             } else {
                 die("Account {$account_code} not found.");
             }
@@ -116,13 +102,13 @@ class CustomConnectionFactory extends ConnectionFactory
         }
 
         try {
-            //@todo escape account code
             if ( $stmt = $this->db->query("
               SELECT id,
                 name,
                 owner_name,
                 owner_email,
                 status,
+                plan,
                 db_schema,
                 brightpearl_account_code,
                 brightpearl_data_centre,

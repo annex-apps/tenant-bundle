@@ -3,13 +3,6 @@ services:
 #        class: Annex\TenantBundle\Example
 #        arguments: ["@service_id", "plain_value", "%parameter%"]
 
-    twig.extension.tenant_information:
-        class: Annex\TenantBundle\Extensions\TenantInformationExtension
-        arguments:
-            - "@annex_tenant.tenant_information"
-        tags:
-            - { name: twig.extension }
-
 #### SERVICES REQUIRED BY [MODIFIED] DEPENDENCIES ####
 
     app.form.registration:
@@ -31,17 +24,9 @@ services:
             - "@session"
 
     annex_tenant.tenant_information:
-        class: Annex\TenantBundle\Extensions\TenantInformation
+        class: Annex\TenantBundle\Services\Tenant
         arguments:
             - "@session"
-            - "@service_container"
-
-    twigdate.listener.request:
-        class: Annex\TenantBundle\Services\TwigDateRequestListener
-        arguments:
-            - "@twig"
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
 #### BRIGHTPEARL HELPER SERVICES ####
 # Allows us to change the API client without changing any other code #

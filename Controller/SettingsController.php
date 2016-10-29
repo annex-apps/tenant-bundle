@@ -25,7 +25,11 @@ class SettingsController extends Controller
         $form->handleRequest($request);
 
         /** @var $repo \Annex\TenantBundle\Repository\SettingRepository */
-        $repo =  $em->getRepository('AnnexTenantBundle:Setting');
+        $repo =  $em->getRepository('Annex\TenantBundle\Entity\Setting');
+
+        /** @var \Annex\TenantBundle\Services\Tenant $tenantService */
+        $tenantService = $this->get('annex_tenant.tenant_information');
+        $tenant = $tenantService->getTenant();
 
         if ($form->isSubmitted()) {
 
@@ -53,7 +57,8 @@ class SettingsController extends Controller
         }
 
         return $this->render('AnnexTenantBundle::settings.html.twig', array(
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'tenant' => $tenant
         ));
 
     }

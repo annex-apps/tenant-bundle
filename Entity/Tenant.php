@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Tenant
  *
- * @ORM\Table(name="notifier_core.tenant", options={"collate"="utf8mb4_unicode_ci", "charset"="utf8mb4"})
+ * @ORM\Table(name="tenant", options={"collate"="utf8mb4_unicode_ci", "charset"="utf8mb4"})
  * @ORM\Entity(repositoryClass="Annex\TenantBundle\Repository\TenantRepository")
  */
 class Tenant

@@ -28,17 +28,6 @@ class Setting
      */
     private $setupValue;
 
-
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
     /**
      * Set setupKey
      *
