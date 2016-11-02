@@ -1,0 +1,30 @@
+{% extends 'AnnexTenantBundle::base.html.twig' %}
+
+{% block heading %}My bills{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <table id="tbl-users" class="table table-hover table-striped">
+                <thead>
+                <th>Reference</th>
+                <th>Date</th>
+                <th>Amount</th>
+                </thead>
+                {% for bill in bills %}
+                    <tr>
+                        <td>{{ bill.id }}</td>
+                        <td>{{ bill.date }}</td>
+                        <td>{{ bill.amount }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}

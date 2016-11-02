@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Driver\PDOException;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -22,14 +23,15 @@ class CustomConnectionFactory extends ConnectionFactory
 
     /**
      * @param Session $session
+     * @param Container $container
      */
-    function __construct(Session $session)
+    function __construct(Session $session, Container $container)
     {
 
         $this->session  = $session;
 
         // the name of the DB that holds the tenant table
-        $this->database = 'notifier_core';
+        $this->database = $container->getParameter('app_info.tenant_db');
 
         if ($url = getenv('RDS_URL')) {
             // Production
@@ -65,9 +67,7 @@ class CustomConnectionFactory extends ConnectionFactory
                 // Switch to use the tenant DB
                 $this->database     = $result[0]['db_schema'];
                 $this->accountId    = $result[0]['id'];
-
-                // All the tenant info in session so we don't need to connect again downstream
-                $this->session->set('tenant', serialize($result[0]));
+                $this->session->set('tenantId', $this->accountId);
             } else {
                 die("Account {$account_code} not found.");
             }
@@ -103,7 +103,8 @@ class CustomConnectionFactory extends ConnectionFactory
 
         try {
             if ( $stmt = $this->db->query("
-              SELECT id,
+              SELECT
+                id,
                 name,
                 owner_name,
                 owner_email,

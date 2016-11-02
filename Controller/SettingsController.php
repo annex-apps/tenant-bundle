@@ -27,9 +27,11 @@ class SettingsController extends Controller
         /** @var $repo \Annex\TenantBundle\Repository\SettingRepository */
         $repo =  $em->getRepository('Annex\TenantBundle\Entity\Setting');
 
-        /** @var \Annex\TenantBundle\Services\Tenant $tenantService */
+        /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
         $tenantService = $this->get('annex_tenant.tenant_information');
-        $tenant = $tenantService->getTenant();
+
+        /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
+        $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
 
         if ($form->isSubmitted()) {
 

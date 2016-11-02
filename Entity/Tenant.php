@@ -2,6 +2,7 @@
 
 namespace Annex\TenantBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -104,6 +105,22 @@ class Tenant
      * @ORM\Column(name="plan", type="string", length=128)
      */
     private $plan = 'BETA';
+
+    /**
+     * @ORM\OneToMany(targetEntity="Subscription", mappedBy="tenant")
+     */
+    private $subscriptions;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Card", mappedBy="tenant")
+     */
+    private $cards;
+
+    public function __construct()
+    {
+        $this->subscriptions  = new ArrayCollection();
+        $this->cards        = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -401,5 +418,21 @@ class Tenant
     public function getPlan()
     {
         return $this->plan;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getSubscriptions()
+    {
+        return $this->subscriptions;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getCards()
+    {
+        return $this->cards;
     }
 }

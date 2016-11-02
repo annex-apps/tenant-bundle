@@ -22,11 +22,13 @@ services:
         class: Annex\TenantBundle\Account\CustomConnectionFactory
         arguments:
             - "@session"
+            - "@service_container"
 
     annex_tenant.tenant_information:
-        class: Annex\TenantBundle\Services\Tenant
+        class: Annex\TenantBundle\Services\TenantService
         arguments:
             - "@session"
+            - "@doctrine.orm.entity_manager"
 
 #### BRIGHTPEARL HELPER SERVICES ####
 # Allows us to change the API client without changing any other code #
