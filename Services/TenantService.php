@@ -9,28 +9,52 @@ namespace Annex\TenantBundle\Services;
 
 use Annex\TenantBundle\Entity\Tenant;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class TenantService
 {
-    /** @var Session */
-    public $session;
+    /** @var string */
+    private $tenantDb;
 
     /** @var EntityManager  */
     private $em;
 
+    /** @var EntityManager  */
+    private $tenantEntityManager;
+
     /** @var Tenant */
     private $tenant;
 
-    public function __construct(Session $session, EntityManager $em)
+    public function __construct(EntityManager $em, $tenantDb)
     {
-        $this->session = $session;
         $this->em = $em;
+        $this->tenantDb = $tenantDb;
+
+        $this->getTenantEntityManager();
     }
 
+    /**
+     * @param $tenantId
+     * @return Tenant|null|object
+     * @throws \Exception
+     */
     public function getTenant($tenantId)
     {
+        /** @var $repo \Annex\TenantBundle\Repository\TenantRepository */
+        $tenantRepo = $this->tenantEntityManager->getRepository('AnnexTenantBundle:Tenant');
 
+        if ($this->tenant = $tenantRepo->find($tenantId)) {
+            return $this->tenant;
+        } else {
+            throw new \Exception("No tenant found for {$tenantId}");
+        }
+    }
+
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Exception
+     */
+    private function getTenantEntityManager()
+    {
         if ($url = getenv('RDS_URL')) {
             // Production
             $dbparts = parse_url($url);
@@ -48,33 +72,34 @@ class TenantService
                 'driver'   => 'pdo_mysql',
                 'user'     => $username,
                 'password' => $password,
-                'dbname'   => 'notifier_core'
+                'dbname'   => $this->tenantDb
             );
 
-            $tenantEm = \Doctrine\ORM\EntityManager::create(
+            $this->tenantEntityManager = \Doctrine\ORM\EntityManager::create(
                 $conn,
                 $this->em->getConfiguration(),
                 $this->em->getEventManager()
             );
 
-            /** @var $repo \Annex\TenantBundle\Repository\TenantRepository */
-            $tenantRepo = $tenantEm->getRepository('AnnexTenantBundle:Tenant');
-
-            if ($this->tenant = $tenantRepo->find($tenantId)) {
-                return $this->tenant;
-            } else {
-                throw new \Exception("No tenant found");
-            }
-
         } else {
-            throw new \Exception("No username or password found");
+            throw new \Exception("No username or password found.");
         }
-
     }
 
-    public function addTenant()
+    /**
+     * Save the tenant back into the tenant DB
+     * @return bool
+     * @throws \Exception
+     */
+    public function persist()
     {
-
+        $this->tenantEntityManager->persist($this->tenant);
+        try {
+            $this->tenantEntityManager->flush();
+            return true;
+        } catch (\Exception $e) {
+            throw new \Exception("Could not save tenant: ".$e->getMessage());
+        }
     }
 
 }

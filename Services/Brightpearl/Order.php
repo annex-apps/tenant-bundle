@@ -2,7 +2,7 @@
 
 namespace Annex\TenantBundle\Services\Brightpearl;
 
-use Annex\TenantBundle\Services\Tenant;
+use Annex\TenantBundle\Entity\Tenant;
 use Annex\TenantBundle\Services\Settings;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\Container;
@@ -10,21 +10,31 @@ use Symfony\Component\DependencyInjection\Container;
 class Order
 {
 
+    /** @var Container  */
     private $container;
+
+    /** @var Tenant */
     private $tenant;
+
     private $settings;
+
     private $brightpearlAccountCode;
     private $brightpearlAccountVersion = '0';
     private $brightpearlDataCentre = 'none';
+
     private $apiClient;
 
     public $errors = [];
 
-    public function __construct(Container $container, Tenant $tenant, Settings $settings)
+    public function __construct(Container $container, Settings $settings)
     {
         $this->container = $container;
-        $this->tenant = $tenant;
         $this->settings = $settings;
+    }
+
+    public function setTenant(Tenant $tenant)
+    {
+        $this->tenant = $tenant;
     }
 
     /**

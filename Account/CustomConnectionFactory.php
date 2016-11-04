@@ -23,15 +23,15 @@ class CustomConnectionFactory extends ConnectionFactory
 
     /**
      * @param Session $session
-     * @param Container $container
+     * @param string $tenantDb
      */
-    function __construct(Session $session, Container $container)
+    function __construct(Session $session, $tenantDb)
     {
 
         $this->session  = $session;
 
         // the name of the DB that holds the tenant table
-        $this->database = $container->getParameter('app_info.tenant_db');
+        $this->database = $tenantDb;
 
         if ($url = getenv('RDS_URL')) {
             // Production
@@ -114,7 +114,7 @@ class CustomConnectionFactory extends ConnectionFactory
                 brightpearl_account_code,
                 brightpearl_data_centre,
                 brightpearl_token
-              FROM notifier_core.tenant
+              FROM tenant
               WHERE stub = '{$account_code}'
               LIMIT 1
               ") ){

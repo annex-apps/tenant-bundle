@@ -67,7 +67,7 @@ class Tenant
     /**
      * @var string
      *
-     * @ORM\Column(name="brightpearl_data_centre", type="string", length=4)
+     * @ORM\Column(name="brightpearl_data_centre", type="string", length=6)
      */
     private $brightpearlDataCentre;
 
@@ -105,6 +105,21 @@ class Tenant
      * @ORM\Column(name="plan", type="string", length=128)
      */
     private $plan = 'BETA';
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="stripe_customer_id", type="string", length=255, nullable=true)
+     */
+    private $stripeCustomerId = '';
+
+    /**
+     * @var Subscription
+     *
+     * @ORM\OneToOne(targetEntity="Subscription")
+     * @ORM\JoinColumn(name="current_subscription", referencedColumnName="id", nullable=true)
+     */
+    private $currentSubscription;
 
     /**
      * @ORM\OneToMany(targetEntity="Subscription", mappedBy="tenant")
@@ -418,6 +433,54 @@ class Tenant
     public function getPlan()
     {
         return $this->plan;
+    }
+
+    /**
+     * Set stripe customer ID
+     *
+     * @param string $stripeCustomerId
+     *
+     * @return Tenant
+     */
+    public function setStripeCustomerId($stripeCustomerId)
+    {
+        $this->stripeCustomerId = $stripeCustomerId;
+
+        return $this;
+    }
+
+    /**
+     * Get stripe customer ID
+     *
+     * @return string
+     */
+    public function getStripeCustomerId()
+    {
+        return $this->stripeCustomerId;
+    }
+
+    /**
+     * Set active subscription
+     *
+     * @param Subscription $subscription
+     *
+     * @return Tenant
+     */
+    public function setCurrentSubscription($subscription)
+    {
+        $this->currentSubscription = $subscription;
+
+        return $this;
+    }
+
+    /**
+     * Get active subscription
+     *
+     * @return Subscription
+     */
+    public function getCurrentSubscription()
+    {
+        return $this->currentSubscription;
     }
 
     /**

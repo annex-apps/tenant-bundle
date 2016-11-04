@@ -2,25 +2,33 @@
 
 namespace Annex\TenantBundle\Services\Brightpearl;
 
-use Annex\TenantBundle\Services\Tenant;
+use Annex\TenantBundle\Entity\Tenant;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\Container;
 
 class Utility
 {
 
+    /** @var Container  */
     private $container;
+
+    /** @var Tenant */
     private $tenant;
+
     private $em;
 
     public $errors   = [];
     public $messages = [];
 
-    public function __construct(Container $container, Tenant $tenant, EntityManager $em)
+    public function __construct(Container $container, EntityManager $em)
     {
         $this->container = $container;
-        $this->tenant = $tenant;
         $this->em = $em;
+    }
+
+    public function setTenant(Tenant $tenant)
+    {
+        $this->tenant = $tenant;
     }
 
     /**
@@ -28,11 +36,6 @@ class Utility
      * @return bool
      */
     public function getBrightpearlToken($brightpearlAccountCode) {
-
-//        if ($this->container->getParameter('kernel.environment') == 'dev') {
-//            return 'token';
-//        }
-
         if ($installedAccounts = $this->getInstalledAccounts()) {
             foreach ($installedAccounts AS $account) {
                 if ($account->accountCode == $brightpearlAccountCode) {
@@ -40,7 +43,6 @@ class Utility
                 }
             }
         }
-
         die('Account '.$brightpearlAccountCode.' does not have this app installed.');
     }
 

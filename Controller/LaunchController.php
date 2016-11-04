@@ -2,7 +2,7 @@
 
 namespace Annex\TenantBundle\Controller;
 
-use Doctrine\DBAL\DriverManager;
+use Annex\TenantBundle\Entity\Tenant;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\OutputWriter;
@@ -11,11 +11,6 @@ use Postmark\PostmarkClient;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Component\Filesystem\Filesystem;
-
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Output\ConsoleOutput;
 
 class LaunchController extends Controller
 {
@@ -38,38 +33,35 @@ class LaunchController extends Controller
 
         $accountCode = preg_replace("/[^a-z0-9]+/i", "", strtolower($request->get('accountCode')));
 
-        $em = $this->getDoctrine()->getManager();
+        /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
+        $tenantService = $this->container->get('annex_tenant.tenant_information');
 
-        /** @var \Annex\TenantBundle\Repository\TenantRepository $tenantRepo */
-        $tenantRepo = $em->getRepository('AnnexTenantBundle:Tenant');
+        /** @var $tenant \Annex\TenantBundle\Entity\Tenant */
+        if (!$tenant = $tenantService->getTenant($this->get('session')->get('tenantId'))) {
+            die("Could not find an account for ".$accountCode);
+        }
 
         /** @var \Annex\TenantBundle\Services\Brightpearl\Utility $utilityService */
         $utilityService = $this->get('service.brightpearl.utility');
+        $utilityService->setTenant($tenant);
 
         $appDomain = $this->getParameter('app_info.domain');
-
-        /** @var $tenant \Annex\TenantBundle\Entity\Tenant */
-        if (!$tenant = $tenantRepo->findOneBy(['brightpearlAccountCode' => $accountCode])) {
-            die("Could not find an account for ".$accountCode);
-        }
 
         // Go to Brightpearl to see if this user has installed the app
         if (!$token = $utilityService->getBrightpearlToken($accountCode)) {
             die("Failed to get install info from Brightpearl");
         }
 
+        // Save the token into the tenant database
         $tenant->setBrightpearlToken($token);
         $tenant->setStatus('TRIAL');
-        $em->persist($tenant);
 
-        try {
-            $em->flush();
-
+        if ($tenantService->persist($tenant)) {
             // We need to already have an empty database
             // Run any migrations that need running
             $this->updateSchema();
-            $this->addAdminUser();
-            $this->addUser();
+            $this->addAdminUser($tenant);
+            $this->addUser($tenant);
 
             $this->sendActivationEmail($tenant);
 
@@ -78,11 +70,9 @@ class LaunchController extends Controller
             } else {
                 return $this->redirect("http://localhost:8000/login?launched=1");
             }
-
-        } catch (\Exception $e) {
-            die($e->getMessage());
+        } else {
+            die("Could not update tenant with token");
         }
-
 
     }
 
@@ -97,6 +87,7 @@ class LaunchController extends Controller
             $message = $this->renderView(
                 'emails/basic.html.twig',
                 [
+                    'tenant' => $tenant,
                     'message' => 'Account "'.$tenant->getName().'" activated'
                 ]
             );
@@ -116,7 +107,7 @@ class LaunchController extends Controller
     /**
      * Add the root user (to a new account)
      */
-    public function addAdminUser()
+    public function addAdminUser($tenant)
     {
         $manager = $this->get('fos_user.user_manager');
 
@@ -144,6 +135,7 @@ class LaunchController extends Controller
             $message = $this->renderView(
                 'AnnexTenantBundle::emails/welcome.html.twig',
                 [
+                    'tenant' => $tenant,
                     'email'    => 'admin@annex-apps.com',
                     'password' => $pass
                 ]
@@ -165,14 +157,15 @@ class LaunchController extends Controller
     }
 
     /**
-     * Add the first staff member (using details from _core)
+     * Add the first staff member (using details from tenant table)
+     * @param Tenant $tenant
      */
-    public function addUser()
+    public function addUser(Tenant $tenant)
     {
 
         $pass  = $this->generatePassword();
-        $name  = explode(' ', $this->get('session')->get('account_owner_name'));
-        $email = $this->get('session')->get('account_owner_email');
+        $name  = $tenant->getOwnerName();
+        $email = $tenant->getOwnerEmail();
 
         $firstName = $name[0];
         $lastName  = '';
@@ -202,6 +195,7 @@ class LaunchController extends Controller
             $message = $this->renderView(
                 'AnnexTenantBundle::emails/welcome.html.twig',
                 [
+                    'tenant' => $tenant,
                     'email' => $email,
                     'password' => $pass
                 ]
@@ -258,7 +252,7 @@ class LaunchController extends Controller
     }
 
     /**
-     * @Route("welcome-test", name="welcome_test")
+     * @Route("email-test", name="email_test")
      */
     public function welcomeTest()
     {
