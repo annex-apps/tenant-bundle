@@ -102,13 +102,6 @@ class Tenant
     /**
      * @var string
      *
-     * @ORM\Column(name="plan", type="string", length=128)
-     */
-    private $plan = 'BETA';
-
-    /**
-     * @var string
-     *
      * @ORM\Column(name="stripe_customer_id", type="string", length=255, nullable=true)
      */
     private $stripeCustomerId = '';
@@ -117,24 +110,21 @@ class Tenant
      * @var Subscription
      *
      * @ORM\OneToOne(targetEntity="Subscription")
-     * @ORM\JoinColumn(name="current_subscription", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="subscription", referencedColumnName="id", nullable=true)
      */
-    private $currentSubscription;
+    private $subscription;
 
     /**
-     * @ORM\OneToMany(targetEntity="Subscription", mappedBy="tenant")
+     * @var Plan
+     *
+     * @ORM\OneToOne(targetEntity="Plan")
+     * @ORM\JoinColumn(name="plan", referencedColumnName="id", nullable=true)
      */
-    private $subscriptions;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Card", mappedBy="tenant")
-     */
-    private $cards;
+    private $plan;
 
     public function __construct()
     {
-        $this->subscriptions  = new ArrayCollection();
-        $this->cards        = new ArrayCollection();
+
     }
 
     /**
@@ -412,30 +402,6 @@ class Tenant
     }
 
     /**
-     * Set plan
-     *
-     * @param string $plan
-     *
-     * @return Tenant
-     */
-    public function setPlan($plan)
-    {
-        $this->plan = $plan;
-
-        return $this;
-    }
-
-    /**
-     * Get plan
-     *
-     * @return string
-     */
-    public function getPlan()
-    {
-        return $this->plan;
-    }
-
-    /**
      * Set stripe customer ID
      *
      * @param string $stripeCustomerId
@@ -460,42 +426,51 @@ class Tenant
     }
 
     /**
-     * Set active subscription
+     * Set subscription
      *
      * @param Subscription $subscription
      *
      * @return Tenant
      */
-    public function setCurrentSubscription($subscription)
+    public function setSubscription($subscription)
     {
-        $this->currentSubscription = $subscription;
+        $this->subscription = $subscription;
 
         return $this;
     }
 
     /**
-     * Get active subscription
+     * Get subscription
      *
      * @return Subscription
      */
-    public function getCurrentSubscription()
+    public function getSubscription()
     {
-        return $this->currentSubscription;
+        return $this->subscription;
     }
 
     /**
-     * @return ArrayCollection
+     * Set plan
+     *
+     * @param Plan $plan
+     *
+     * @return Tenant
      */
-    public function getSubscriptions()
+    public function setPlan($plan)
     {
-        return $this->subscriptions;
+        $this->plan = $plan;
+
+        return $this;
     }
 
     /**
-     * @return ArrayCollection
+     * Get plan
+     *
+     * @return Plan
      */
-    public function getCards()
+    public function getPlan()
     {
-        return $this->cards;
+        return $this->plan;
     }
+
 }

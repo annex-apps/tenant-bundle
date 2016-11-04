@@ -33,6 +33,9 @@ class Subscription
     /**
      * @var string
      *
+     * Stripe statuses:
+     * trialing, active, past_due, canceled, unpaid
+     *
      * @ORM\Column(name="status", type="string", length=16)
      */
     private $status;
@@ -52,18 +55,25 @@ class Subscription
     private $currency;
 
     /**
-     * @var int
-     *
-     * @ORM\Column(name="billing_day", type="integer")
-     */
-    private $billingDay;
-
-    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
      */
     private $createdAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="canceled_at", type="datetime")
+     */
+    private $canceledAt;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="stripe_id", type="string", length=255, nullable=true)
+     */
+    private $stripeId;
 
     /**
      * Gets triggered only on insert
@@ -181,30 +191,6 @@ class Subscription
     }
 
     /**
-     * Set billingDay
-     *
-     * @param integer $billingDay
-     *
-     * @return Subscription
-     */
-    public function setBillingDay($billingDay)
-    {
-        $this->billingDay = $billingDay;
-
-        return $this;
-    }
-
-    /**
-     * Get billingDay
-     *
-     * @return int
-     */
-    public function getBillingDay()
-    {
-        return $this->billingDay;
-    }
-
-    /**
      * Set createdAt
      *
      * @param \DateTime $createdAt
@@ -226,6 +212,54 @@ class Subscription
     public function getCreatedAt()
     {
         return $this->createdAt;
+    }
+
+    /**
+     * Set canceledAt
+     *
+     * @param \DateTime $canceledAt
+     *
+     * @return Subscription
+     */
+    public function setCanceledAt($canceledAt)
+    {
+        $this->canceledAt = $canceledAt;
+
+        return $this;
+    }
+
+    /**
+     * Get canceledAt
+     *
+     * @return \DateTime
+     */
+    public function getCanceledAt()
+    {
+        return $this->canceledAt;
+    }
+
+    /**
+     * Set stripeId
+     *
+     * @param string $stripeId
+     *
+     * @return Subscription
+     */
+    public function setStripeId($stripeId)
+    {
+        $this->stripeId = $stripeId;
+
+        return $this;
+    }
+
+    /**
+     * Get stripeId
+     *
+     * @return string
+     */
+    public function getStripeId()
+    {
+        return $this->stripeId;
     }
 }
 

@@ -12,24 +12,24 @@ use Doctrine\ORM\EntityManager;
 
 class TenantService
 {
+    /** @var EntityManager  */
+    private $coreEntityManager;
+
     /** @var string */
-    private $tenantDb;
+    private $coreDbName;
 
     /** @var EntityManager  */
     private $em;
 
-    /** @var EntityManager  */
-    private $tenantEntityManager;
-
     /** @var Tenant */
     private $tenant;
 
-    public function __construct(EntityManager $em, $tenantDb)
+    public function __construct(EntityManager $em, $coreDbName)
     {
         $this->em = $em;
-        $this->tenantDb = $tenantDb;
+        $this->coreDbName = $coreDbName;
 
-        $this->getTenantEntityManager();
+        $this->getCoreEntityManager();
     }
 
     /**
@@ -40,7 +40,7 @@ class TenantService
     public function getTenant($tenantId)
     {
         /** @var $repo \Annex\TenantBundle\Repository\TenantRepository */
-        $tenantRepo = $this->tenantEntityManager->getRepository('AnnexTenantBundle:Tenant');
+        $tenantRepo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Tenant');
 
         if ($this->tenant = $tenantRepo->find($tenantId)) {
             return $this->tenant;
@@ -53,7 +53,7 @@ class TenantService
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    private function getTenantEntityManager()
+    private function getCoreEntityManager()
     {
         if ($url = getenv('RDS_URL')) {
             // Production
@@ -72,10 +72,10 @@ class TenantService
                 'driver'   => 'pdo_mysql',
                 'user'     => $username,
                 'password' => $password,
-                'dbname'   => $this->tenantDb
+                'dbname'   => $this->coreDbName
             );
 
-            $this->tenantEntityManager = \Doctrine\ORM\EntityManager::create(
+            $this->coreEntityManager = \Doctrine\ORM\EntityManager::create(
                 $conn,
                 $this->em->getConfiguration(),
                 $this->em->getEventManager()
@@ -93,13 +93,26 @@ class TenantService
      */
     public function persist()
     {
-        $this->tenantEntityManager->persist($this->tenant);
+        $this->coreEntityManager->persist($this->tenant);
         try {
-            $this->tenantEntityManager->flush();
+            $this->coreEntityManager->flush();
             return true;
         } catch (\Exception $e) {
             throw new \Exception("Could not save tenant: ".$e->getMessage());
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getPlans()
+    {
+        /** @var $repo \Annex\TenantBundle\Repository\PlanRepository */
+        $repo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Plan');
+
+        $plans = $repo->findAll();
+
+        return $plans;
     }
 
 }

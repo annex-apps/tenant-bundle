@@ -1,13 +1,31 @@
 {% extends 'AnnexTenantBundle::base.html.twig' %}
 
-{% block heading %}My bills{% endblock %}
+{% block heading %}My subscription{% endblock %}
 
 {% block content %}
+
+    {% if tenant.subscription %}
+        <div>
+            Subs info here
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            You don't yet have a subscription
+        </div>
+    {% endif %}
+
+    <div class="row">
+        {% for plan in plans %}
+            <div class="col-md-3">
+                <h4>{{ plan.name }}</h4>
+            </div>
+        {% endfor %}
+    </div>
 
     <div class="row">
         <div class="col-md-12">
             <h4>Stored cards</h4>
-            {% if tenant.cards|length > 0 %}
+            {% if cards|length > 0 %}
 
             {% else %}
                 <div class="alert">
@@ -21,20 +39,20 @@
         <div class="col-md-12">
             <h4>Bills</h4>
             {% if bills|length > 0 %}
-            <table id="tbl-users" class="table table-hover table-striped">
-                <thead>
-                <th>Reference</th>
-                <th>Date</th>
-                <th>Amount</th>
-                </thead>
-                {% for bill in bills %}
-                    <tr>
-                        <td>{{ bill.id }}</td>
-                        <td>{{ bill.date }}</td>
-                        <td>{{ bill.amount }}</td>
-                    </tr>
-                {% endfor %}
-            </table>
+                <table id="tbl-users" class="table table-hover table-striped">
+                    <thead>
+                    <th>Reference</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    </thead>
+                    {% for bill in bills %}
+                        <tr>
+                            <td>{{ bill.id }}</td>
+                            <td>{{ bill.date }}</td>
+                            <td>{{ bill.amount }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
             {% else %}
                 <div class="alert">
                     You don't have any bills yet.

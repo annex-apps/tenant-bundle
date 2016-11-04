@@ -21,10 +21,15 @@ class BillingController extends Controller
         /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
         $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
 
+        $plans = $tenantService->getPlans();
+
         $bills = [];
+        $cards = [];
         return $this->render('AnnexTenantBundle::billing.html.twig', [
             'tenant' => $tenant,
-            'bills'  => $bills
+            'bills'  => $bills,
+            'cards'  => $cards,
+            'plans'  => $plans
         ]);
     }
 
