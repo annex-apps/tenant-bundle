@@ -35,8 +35,8 @@ class StripeHandler
             $this->setApiKey($this->apiKey);
         }
 
-//        $curl = new \Stripe\HttpClient\CurlClient(array(CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1));
-//        \Stripe\ApiRequestor::setHttpClient($curl);
+        $curl = new \Stripe\HttpClient\CurlClient(array(CURLOPT_SSLVERSION => 6));
+        \Stripe\ApiRequestor::setHttpClient($curl);
 
         Stripe::$apiBase = "https://api-tls12.stripe.com";
     }
