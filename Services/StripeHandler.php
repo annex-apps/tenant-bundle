@@ -61,7 +61,7 @@ class StripeHandler
      * @param array $customer
      * @return \Stripe\Customer
      */
-    public function createCustomer($customer = [])
+    public function createCustomer($customer)
     {
         try {
             $stripeCustomer = \Stripe\Customer::create($customer);
@@ -156,6 +156,20 @@ class StripeHandler
         try {
             $charge = \Stripe\Charge::create($params);
             return $charge;
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            return false;
+        }
+    }
+
+    /**
+     * @return bool|\Stripe\Collection
+     */
+    public function getPlans()
+    {
+        try {
+            $plans = \Stripe\Plan::all();
+            return $plans;
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
             return false;

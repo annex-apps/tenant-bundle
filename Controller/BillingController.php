@@ -22,7 +22,15 @@ class BillingController extends Controller
         /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
         $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
 
-        $plans = $tenantService->getPlans();
+//        $plans = $tenantService->getPlans();
+
+        /** @var \Annex\TenantBundle\Services\StripeHandler $stripeService */
+        $stripeService = $this->get('service.stripe');
+        if (!$plans = $stripeService->getPlans()) {
+            foreach ($stripeService->errors AS $error) {
+                $this->addFlash('error', $error);
+            }
+        }
 
         $bills = [];
         return $this->render('AnnexTenantBundle::billing.html.twig', [
@@ -54,6 +62,7 @@ class BillingController extends Controller
 
         if ($token = $request->get('stripeToken') && $email = $request->get('stripeEmail')) {
 
+            // We don't yet have this customer in Stripe, create them
             if (!$stripeCustomerId = $tenant->getStripeCustomerId()) {
                 $newCustomerData = [
                     'description' => $tenant->getOwnerName(),
