@@ -7,6 +7,7 @@
 
 namespace Annex\TenantBundle\Services;
 
+use Annex\TenantBundle\Entity\Subscription;
 use Annex\TenantBundle\Entity\Tenant;
 use Doctrine\ORM\EntityManager;
 
@@ -46,6 +47,34 @@ class TenantService
             return $this->tenant;
         } else {
             throw new \Exception("No tenant found for {$tenantId}");
+        }
+    }
+
+    /**
+     * @param $subscriptionData
+     * @return bool
+     * @throws \Exception
+     */
+    public function addSubscription($subscriptionData)
+    {
+        // Create the subscription locally
+        $subscription = new Subscription();
+        $subscription->setTenant($this->tenant);
+        $subscription->setAmount($subscriptionData['amount']);
+        $subscription->setStatus(Subscription::STATUS_ACTIVE);
+        $subscription->setCurrency($subscriptionData['currency']);
+
+        // Save a new subscription
+        $this->coreEntityManager->persist($subscription);
+
+        // Also update the tenant
+//        $this->coreEntityManager->persist($this->tenant);
+
+        try {
+            $this->coreEntityManager->flush();
+            return true;
+        } catch (\Exception $e) {
+            throw new \Exception("Could not save subscription: ".$e->getMessage());
         }
     }
 
@@ -91,7 +120,7 @@ class TenantService
      * @return bool
      * @throws \Exception
      */
-    public function persist()
+    public function updateTenant()
     {
         $this->coreEntityManager->persist($this->tenant);
         try {

@@ -32,6 +32,13 @@ class Plan
     /**
      * @var string
      *
+     * @ORM\Column(name="amount", type="decimal", precision=10, scale=2)
+     */
+    private $amount;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="name", type="string", length=32)
      */
     private $name;
@@ -75,6 +82,30 @@ class Plan
     public function getCode()
     {
         return $this->code;
+    }
+
+    /**
+     * Set amount
+     *
+     * @param string $amount
+     *
+     * @return Plan
+     */
+    public function setAmount($amount)
+    {
+        $this->amount = $amount;
+
+        return $this;
+    }
+
+    /**
+     * Get amount
+     *
+     * @return string
+     */
+    public function getAmount()
+    {
+        return $this->amount;
     }
 
     /**

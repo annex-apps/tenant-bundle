@@ -30,6 +30,13 @@ services:
             - "@doctrine.orm.entity_manager"
             - "%app_info.tenant_db%"
 
+#### PAYMENT SERVICES ####
+    service.stripe:
+        class: Annex\TenantBundle\Services\StripeHandler
+        arguments:
+            - "%stripe_private_key%"
+            - "%app_info.currency%"
+
 #### BRIGHTPEARL HELPER SERVICES ####
 # Allows us to change the API client without changing any other code #
 

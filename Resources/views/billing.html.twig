@@ -1,5 +1,7 @@
 {% extends 'AnnexTenantBundle::base.html.twig' %}
 
+{% block headerjavascript %}{% endblock %}
+
 {% block heading %}My subscription{% endblock %}
 
 {% block content %}
@@ -18,21 +20,25 @@
         {% for plan in plans %}
             <div class="col-md-3">
                 <h4>{{ plan.name }}</h4>
+
+                {% if plan.amount > 0 %}
+                <form action="{{ path('subscription_add') }}" method="POST">
+                    <script
+                            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                            data-key="{{ stripe_public_key }}"
+                            data-amount="{{ plan.amount * 100 }}"
+                            data-label="Start {{ plan.name }} Subscription"
+                            data-name="Annex Apps"
+                            data-description="{{ plan.name }} subscription"
+                            data-locale="auto"
+                            data-zip-code="true"
+                            data-currency="gbp"
+                            data-allow-remember-me="false">
+                    </script>
+                </form>
+                {% endif %}
             </div>
         {% endfor %}
-    </div>
-
-    <div class="row">
-        <div class="col-md-12">
-            <h4>Stored cards</h4>
-            {% if cards|length > 0 %}
-
-            {% else %}
-                <div class="alert">
-                    You don't have any cards yet.
-                </div>
-            {% endif %}
-        </div>
     </div>
 
     <div class="row">
@@ -63,6 +69,40 @@
 
 {% endblock %}
 
-{% block stylesheets %}
+{% block stylesheets %}{% endblock %}
 
+{% block javascripts %}
+    <script>
+//        var handler = StripeCheckout.configure({
+//            key: stripePublicApiKey,
+//            locale: 'auto',
+//            token: function(token) {
+//                $(".stripe-token").val(token.id);
+//                $(".modal-body form").submit();
+//                waitButton($('.payment-submit'));
+//            }
+//        });
+//
+//        $(document).delegate(".add-card", 'click', function(e) {
+//            // Open Checkout with further options:
+//            handler.open({
+//                name: 'Lend Engine',
+//                description: 'Payment',
+//                zipCode: false,
+//                currency: "gbp",
+//                allowRememberMe: false,
+//                email: $(".contact-email").val(),
+//                amount: $(".payment-amount").val()*100
+//            });
+//            e.preventDefault();
+//        });
+//
+//        // Close Checkout on page navigation:
+//        $(window).on('popstate', function() {
+//            if (handler != undefined) {
+//                handler.close();
+//            }
+//        });
+    </script>
+    {#<script src="https://checkout.stripe.com/checkout.js"></script>#}
 {% endblock %}

@@ -56,7 +56,7 @@ class LaunchController extends Controller
         $tenant->setBrightpearlToken($token);
         $tenant->setStatus('TRIAL');
 
-        if ($tenantService->persist($tenant)) {
+        if ($tenantService->updateTenant()) {
             // We need to already have an empty database
             // Run any migrations that need running
             $this->updateSchema();

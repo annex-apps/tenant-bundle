@@ -13,6 +13,14 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Subscription
 {
+
+    /** Statuses as used by Stripe */
+    const STATUS_TRIALING  = 'trialing';
+    const STATUS_ACTIVE    = 'active';
+    const STATUS_PAST_DUE  = 'past_due';
+    const STATUS_CANCELED  = 'canceled';
+    const STATUS_UNPAID    = 'unpaid';
+
     /**
      * @var int
      *
