@@ -14,8 +14,13 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
+        /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
+        $tenantService = $this->get('annex_tenant.tenant_information');
+
+        $plans = $tenantService->getPlans();
+
         return $this->render('AnnexTenantBundle::dash.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
+            'plans' => $plans
         ]);
     }
 

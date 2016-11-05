@@ -23,6 +23,7 @@ services:
         arguments:
             - "@session"
             - "%app_info.tenant_db%"
+            - "%app_info.domain%"
 
     annex_tenant.tenant_information:
         class: Annex\TenantBundle\Services\TenantService

@@ -21,17 +21,24 @@ class CustomConnectionFactory extends ConnectionFactory
     private $password;
     private $accountId;
 
+    /** @var string Used to detect we are on the SSL main heroku domain */
+    private $appUrl;
+
     /**
      * @param Session $session
-     * @param string $tenantDb
+     * @param $tenantDb
+     * @param $appUrl
      */
-    function __construct(Session $session, $tenantDb)
+    function __construct(Session $session, $tenantDb, $appUrl)
     {
 
         $this->session  = $session;
 
         // the name of the DB that holds the tenant table
         $this->database = $tenantDb;
+
+        // The domain of the generic handler eg annex-notifier.herokuapp.com
+        $this->appUrl = $appUrl;
 
         if ($url = getenv('RDS_URL')) {
             // Production
@@ -134,13 +141,12 @@ class CustomConnectionFactory extends ConnectionFactory
     {
 
         if (isset($_GET['account']) && $_GET['account']) {
-            // AJAX call to a common app domain from a user script
             return $_REQUEST['account'];
         }
 
-        if (isset($_GET['state']) && $_GET['state']) {
-            // We're coming back from Stripe.com oAuth into the HTTPS Heroku domain so we don't have a subdomain
-            return $_REQUEST['state'];
+        // When receiving callbacks from Stripe or other services to the main domain handler
+        if ($_SERVER['HTTP_HOST'] == $this->appUrl) {
+            return false;
         }
 
         // Comment out this section to test the signup process on dev
@@ -152,7 +158,7 @@ class CustomConnectionFactory extends ConnectionFactory
         // Get account from subdomain (will not return anything when called from command line)
         if (isset($_SERVER['HTTP_HOST'])) {
             $d = explode(".",$_SERVER['HTTP_HOST']);
-            if ($d[0] != 'localhost:8000') {
+            if ($d[0] != 'localhost:8000' && $d[0] != '') {
                 return $d[0];
             }
         }
