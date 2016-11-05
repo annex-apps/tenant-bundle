@@ -30,15 +30,12 @@ class LaunchController extends Controller
      */
     public function launchTenant(Request $request)
     {
-
-        $accountCode = preg_replace("/[^a-z0-9]+/i", "", strtolower($request->get('accountCode')));
-
         /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
         $tenantService = $this->container->get('annex_tenant.tenant_information');
 
         /** @var $tenant \Annex\TenantBundle\Entity\Tenant */
         if (!$tenant = $tenantService->getTenant($this->get('session')->get('tenantId'))) {
-            die("Could not find an account for ".$accountCode);
+            die("Could not find an account for ".$request->get('accountCode'));
         }
 
         /** @var \Annex\TenantBundle\Services\Brightpearl\Utility $utilityService */
@@ -48,7 +45,7 @@ class LaunchController extends Controller
         $appDomain = $this->getParameter('app_info.domain');
 
         // Go to Brightpearl to see if this user has installed the app
-        if (!$token = $utilityService->getBrightpearlToken($accountCode)) {
+        if (!$token = $utilityService->getBrightpearlToken($tenant->getBrightpearlAccountCode())) {
             die("Failed to get install info from Brightpearl");
         }
 
@@ -66,7 +63,7 @@ class LaunchController extends Controller
             $this->sendActivationEmail($tenant);
 
             if ($this->getParameter("kernel.environment") == 'prod') {
-                return $this->redirect("http://{$accountCode}.{$appDomain}/login?launched=1");
+                return $this->redirect("http://{$tenant->getBrightpearlAccountCode()}.{$appDomain}/login?launched=1");
             } else {
                 return $this->redirect("http://localhost:8000/login?launched=1");
             }
@@ -164,7 +161,7 @@ class LaunchController extends Controller
     {
 
         $pass  = $this->generatePassword();
-        $name  = $tenant->getOwnerName();
+        $name  = explode(' ', $tenant->getOwnerName());
         $email = $tenant->getOwnerEmail();
 
         $firstName = $name[0];

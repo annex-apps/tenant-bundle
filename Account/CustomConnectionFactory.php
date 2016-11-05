@@ -139,21 +139,21 @@ class CustomConnectionFactory extends ConnectionFactory
      */
     private function determineAccountCode()
     {
-
-        if (isset($_GET['account']) && $_GET['account']) {
-            return $_REQUEST['account'];
-        }
-
-        // When receiving callbacks from Stripe or other services to the main domain handler
-        if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == $this->appUrl) {
-            // return false directs the connection to continue to core DB rather than tenant DB
-            return false;
+        // Launching a new account, clicking activation link in email
+        if (isset($_GET['accountCode']) && $_GET['accountCode']) {
+            return $_REQUEST['accountCode'];
         }
 
         // Comment out this section to test the signup process on dev
         // When you receive the activation email, un-comment this section and then click the link to activate
         if (getenv('SYMFONY_ENV') != 'prod') {
             return 'yosemite';
+        }
+
+        // When receiving callbacks from Stripe or other services to the main domain handler
+        if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == $this->appUrl) {
+            // return false directs the connection to continue to core DB rather than tenant DB
+            return false;
         }
 
         // Get account from subdomain (will not return anything when called from command line)

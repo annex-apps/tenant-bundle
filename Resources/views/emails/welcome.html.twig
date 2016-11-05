@@ -13,7 +13,7 @@
     <table cellpadding="10" cellspacing="0">
         <tr>
             <td>Login URL:</td>
-            <td><a href="http://{{ tenant.stub }}.annex-apps.com/admin">http://{{ tenant.stub }}.annex-apps.com/admin</a></td>
+            <td><a href="http://{{ tenant.stub }}.{{ app_domain }}/admin">http://{{ tenant.stub }}.{{ app_domain }}/admin</a></td>
         </tr>
         <tr>
             <td>Email address:</td>
@@ -24,18 +24,5 @@
             <td>{{ password }}</td>
         </tr>
     </table>
-
-    <br>
-    <p>
-        <strong>You're now ready to install Annex Apps from your Brightpearl App Store.</strong>
-    </p>
-    <br>
-    <p>
-        If you can't see Annex Apps in your Brightpearl account, just fire us an email: help@annex-apps.com
-    </p>
-    <br>
-    <p>
-        Read our <a href="https://annexapps.zendesk.com/hc/en-gb">getting started guides</a>
-    </p>
 
 {% endblock %}
