@@ -35,11 +35,14 @@ class StripeHandler
             $this->setApiKey($this->apiKey);
         }
 
+//        $curl = new \Stripe\HttpClient\CurlClient(array(CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1));
+//        \Stripe\ApiRequestor::setHttpClient($curl);
+
         Stripe::$apiBase = "https://api-tls12.stripe.com";
     }
 
     /**
-     * Can be given in the controller each time this handler is called
+     * Can be given in the controller each time this service is called
      * Allows the controller to decide which Stripe account is charged
      * @param $apiKey
      */
