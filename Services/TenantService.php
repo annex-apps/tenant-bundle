@@ -23,7 +23,7 @@ class TenantService
     private $em;
 
     /** @var Tenant */
-    private $tenant;
+    public $tenant;
 
     public function __construct(EntityManager $em, $coreDbName)
     {
@@ -60,9 +60,10 @@ class TenantService
         // Create the subscription locally
         $subscription = new Subscription();
         $subscription->setTenant($this->tenant);
-        $subscription->setAmount($subscriptionData['amount']);
+        $subscription->setAmount($subscriptionData['plan']['amount']);
+        $subscription->setCurrency($subscriptionData['plan']['currency']);
         $subscription->setStatus(Subscription::STATUS_ACTIVE);
-        $subscription->setCurrency($subscriptionData['currency']);
+        $subscription->setStripeId($subscriptionData['id']);
 
         // Save a new subscription
         $this->coreEntityManager->persist($subscription);

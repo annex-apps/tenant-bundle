@@ -70,7 +70,7 @@ class BillingController extends Controller
             }
 
             // Update the tenant
-            $tenant->setStripeCustomerId($stripeCustomerId);
+            $tenantService->tenant->setStripeCustomerId($stripeCustomerId);
             $tenantService->updateTenant();
 
             // Create a subscription

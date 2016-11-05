@@ -42,7 +42,7 @@ class LaunchController extends Controller
         $utilityService = $this->get('service.brightpearl.utility');
         $utilityService->setTenant($tenant);
 
-        $appDomain = $this->getParameter('app_info.domain');
+        $appDomain = $this->getParameter('app_info.tld');
 
         // Go to Brightpearl to see if this user has installed the app
         if (!$token = $utilityService->getBrightpearlToken($tenant->getBrightpearlAccountCode())) {

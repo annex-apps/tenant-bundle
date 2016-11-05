@@ -80,11 +80,11 @@ class StripeHandler
     public function createSubscription($stripeCustomerId, $plan)
     {
         try {
-            $stripeCustomer = \Stripe\Subscription::create([
+            $subscription = \Stripe\Subscription::create([
                 'customer' => $stripeCustomerId,
                 'plan' => $plan
             ]);
-            return $stripeCustomer;
+            return $subscription;
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
             return false;
