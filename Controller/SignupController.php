@@ -81,13 +81,7 @@ class SignupController extends Controller
                 try {
                     $em->flush();
 
-                    // Full domain as this is an email link
-                    if ($this->getParameter("kernel.environment") == 'dev') {
-                        $activationUrl = 'http://localhost:8000/launch?accountCode='.$subDomain;
-                    } else {
-                        $activationUrl = 'http://'.$appDomain.'/launch?accountCode='.$subDomain;
-                    }
-
+                    $activationUrl = 'http://'.$appDomain.'/launch?accountCode='.$subDomain;
                     $this->sendActivationEmail($activationUrl, $toEmail);
 
                     // Send email to admin

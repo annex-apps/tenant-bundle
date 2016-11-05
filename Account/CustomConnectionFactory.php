@@ -141,7 +141,7 @@ class CustomConnectionFactory extends ConnectionFactory
     {
         // Launching a new account, clicking activation link in email
         if (isset($_GET['accountCode']) && $_GET['accountCode']) {
-            return $_REQUEST['accountCode'];
+            return $_GET['accountCode'];
         }
 
         // Comment out this section to test the signup process on dev
