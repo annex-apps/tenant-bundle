@@ -135,7 +135,7 @@ class CustomConnectionFactory extends ConnectionFactory
     }
 
     /**
-     * @return string
+     * @return bool|string
      */
     private function determineAccountCode()
     {
@@ -145,7 +145,8 @@ class CustomConnectionFactory extends ConnectionFactory
         }
 
         // When receiving callbacks from Stripe or other services to the main domain handler
-        if ($_SERVER['HTTP_HOST'] == $this->appUrl) {
+        if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == $this->appUrl) {
+            // return false directs the connection to continue to core DB rather than tenant DB
             return false;
         }
 
@@ -158,7 +159,8 @@ class CustomConnectionFactory extends ConnectionFactory
         // Get account from subdomain (will not return anything when called from command line)
         if (isset($_SERVER['HTTP_HOST'])) {
             $d = explode(".",$_SERVER['HTTP_HOST']);
-            if ($d[0] != 'localhost:8000' && $d[0] != '') {
+            // Allowing www as a special case lets us use the domain for signup and helper actions
+            if ($d[0] != 'localhost:8000' && $d[0] != 'www') {
                 return $d[0];
             }
         }
