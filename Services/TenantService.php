@@ -86,11 +86,13 @@ class TenantService
     {
         if ($url = getenv('RDS_URL')) {
             // Production
-            $dbparts = parse_url($url);
+            $dbparts  = parse_url($url);
+            $server   = $dbparts['host'];
             $username = $dbparts['user'];
             $password = $dbparts['pass'];
         } else if (getenv('DEV_DB_USER')) {
             // Dev
+            $server   = '127.0.0.1';
             $username = getenv('DEV_DB_USER');
             $password = getenv('DEV_DB_PASS');
         }
@@ -99,6 +101,8 @@ class TenantService
 
             $conn = array(
                 'driver'   => 'pdo_mysql',
+                'port'     => 3306,
+                'host'     => $server,
                 'user'     => $username,
                 'password' => $password,
                 'dbname'   => $this->coreDbName
