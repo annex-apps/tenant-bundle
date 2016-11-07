@@ -39,13 +39,14 @@ class StripeWebhookController extends Controller
             'event'  => $event->object
         ];
 
-        $this->sendWebhookNotification( print_r($event_json, true) );
+        $subject = "Webhook: ".$event_json->type;
+        $this->sendWebhookNotification($subject, print_r($event_json, true) );
 
         // Thank you Stripe
         return new JsonResponse($responseJson);
     }
 
-    private function sendWebhookNotification($messageBody)
+    private function sendWebhookNotification($subject, $messageBody)
     {
         try {
             $client = new PostmarkClient($this->getParameter('annex.postmark_api_key'));
@@ -58,7 +59,7 @@ class StripeWebhookController extends Controller
             $client->sendEmail(
                 "Annex Apps <system@annex-apps.com>",
                 'hello@annex-apps.com',
-                "Webhook notification",
+                $subject,
                 $message
             );
         } catch (\Exception $generalException) {
