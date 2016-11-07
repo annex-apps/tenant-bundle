@@ -397,3 +397,24 @@ span.app-status {
 .status-paused {
     color: #ff4930;
 }
+
+/* PAYMENT PROCESSING */
+
+.creditCard {
+    width: 180px;
+    float: left;
+    padding: 10px;
+    border: 1px solid #d4dee8;
+    border-radius: 4px;
+    font-size: 12px;
+    margin: 0 20px 10px 0;
+    background-color: #fafafa;
+}
+.creditCard.active {
+    background-color: #e4f2fe;
+    border: 1px solid #afcfe8;
+}
+.creditCardText {
+    font-family: "Courier New", Courier, mono;
+    font-weight: bold;
+}

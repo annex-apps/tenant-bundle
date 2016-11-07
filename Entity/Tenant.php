@@ -114,14 +114,6 @@ class Tenant
      */
     private $subscription;
 
-    /**
-     * @var Plan
-     *
-     * @ORM\OneToOne(targetEntity="Plan")
-     * @ORM\JoinColumn(name="plan", referencedColumnName="id", nullable=true)
-     */
-    private $plan;
-
     public function __construct()
     {
 
@@ -447,30 +439,6 @@ class Tenant
     public function getSubscription()
     {
         return $this->subscription;
-    }
-
-    /**
-     * Set plan
-     *
-     * @param Plan $plan
-     *
-     * @return Tenant
-     */
-    public function setPlan($plan)
-    {
-        $this->plan = $plan;
-
-        return $this;
-    }
-
-    /**
-     * Get plan
-     *
-     * @return Plan
-     */
-    public function getPlan()
-    {
-        return $this->plan;
     }
 
 }

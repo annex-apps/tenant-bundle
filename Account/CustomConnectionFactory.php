@@ -116,7 +116,7 @@ class CustomConnectionFactory extends ConnectionFactory
                 owner_name,
                 owner_email,
                 status,
-                plan,
+                subscription,
                 db_schema,
                 brightpearl_account_code,
                 brightpearl_data_centre,
@@ -127,7 +127,7 @@ class CustomConnectionFactory extends ConnectionFactory
               ") ){
                 return $stmt->fetchAll(\PDO::FETCH_ASSOC);
             } else {
-                die("Query failed for account {$account_code} on DB {$this->database}");
+                die("Could not get account information for {$account_code} on DB {$this->database}.");
             }
         } catch(PDOException $ex) {
             die("Failed to run query");
@@ -151,7 +151,9 @@ class CustomConnectionFactory extends ConnectionFactory
         }
 
         // When receiving callbacks from Stripe or other services to the main domain handler
-        if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == $this->appUrl) {
+        if (isset($_SERVER['HTTP_HOST'])
+            && $_SERVER['HTTP_HOST'] == $this->appUrl
+            && $_SERVER['HTTP_HOST'] != 'localhost:8000') {
             // return false directs the connection to continue to core DB rather than tenant DB
             return false;
         }

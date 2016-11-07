@@ -8,53 +8,81 @@
 
     {% if tenant.subscription %}
         <div>
-            Subs info here
+            You are on {{ tenant.subscription.plan.name }}
+            <a href="{{ path('subscription_cancel') }}" class="card-delete">Cancel my subscription</a>
         </div>
+
+        <br>
+
+        {% if cards|length > 0 %}
+            <div style="overflow: hidden">
+                {% for card in cards %}
+                    <span class="creditCard" id="{{ card.id }}">
+                        <span class="creditCardText">
+                            {{ card.brand }}<br />
+                            XXXX XXXX XXXX {{ card.last4 }}<br />
+                            {{ card.exp_month }} / {{ card.exp_year }}
+                        </span>
+                        <br />
+                        <a href="{{ path('card_delete', {cardId: card.id}) }}" class="card-delete">Delete this card</a>
+                    </span>
+                {% endfor %}
+            </div>
+        {% else %}
+
+            <div class="alert alert-danger">
+                We don't have any cards on record for you.
+                You still have an active subscription, which will be cancelled at the end of the current billing period
+                if we can't charge a card.
+            </div>
+
+        {% endif %}
+
     {% else %}
-        <div class="alert alert-info">
+
+        <div class="alert alert-warning">
             You don't yet have a subscription
         </div>
+
     {% endif %}
 
-    <div class="row">
+    <div class="row" id="plans">
+        <form id="plan-form" action="{{ path('subscription_add') }}" method="POST">
+            <input type="hidden" name="stripeToken" id="stripeToken">
+            <input type="hidden" name="stripeEmail" id="stripeEmail" value="{{ tenant.ownerEmail }}">
         {% for plan in plans %}
             <div class="col-md-3">
                 <h4>{{ plan.name }}</h4>
-
                 {% if plan.amount > 0 %}
-                <form action="{{ path('subscription_add') }}" method="POST">
-                    <script
-                            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                            data-key="{{ stripe_public_key }}"
-                            data-amount="{{ plan.amount * 100 }}"
-                            data-label="Start {{ plan.name }} Subscription"
-                            data-name="Annex Apps"
-                            data-description="{{ plan.name }} subscription"
-                            data-locale="auto"
-                            data-zip-code="true"
-                            data-currency="gbp"
-                            data-allow-remember-me="false">
-                    </script>
-                </form>
+                    <button type="submit" class="btn btn-success plan-subscribe">
+                        Get started
+                    </button>
                 {% endif %}
             </div>
         {% endfor %}
+        </form>
     </div>
+
+    <br>
 
     <div class="row">
         <div class="col-md-12">
-            <h4>Bills</h4>
+            <h4>Invoices</h4>
             {% if bills|length > 0 %}
                 <table id="tbl-users" class="table table-hover table-striped">
                     <thead>
                     <th>Reference</th>
                     <th>Date</th>
+                    <th>From</th>
+                    <th>To</th>
                     <th>Amount</th>
                     </thead>
                     {% for bill in bills %}
                         <tr>
                             <td>{{ bill.id }}</td>
-                            <td>{{ bill.date }}</td>
+                            <td>{{ bill.date|date }}</td>
+                            <td>{{ bill.period_start|date }}</td>
+                            <td>{{ bill.period_end|date }}</td>
                             <td>{{ bill.amount }}</td>
                         </tr>
                     {% endfor %}
@@ -72,37 +100,35 @@
 {% block stylesheets %}{% endblock %}
 
 {% block javascripts %}
+    <script src="https://checkout.stripe.com/checkout.js"></script>
     <script>
-//        var handler = StripeCheckout.configure({
-//            key: stripePublicApiKey,
-//            locale: 'auto',
-//            token: function(token) {
-//                $(".stripe-token").val(token.id);
-//                $(".modal-body form").submit();
-//                waitButton($('.payment-submit'));
-//            }
-//        });
-//
-//        $(document).delegate(".add-card", 'click', function(e) {
-//            // Open Checkout with further options:
-//            handler.open({
-//                name: 'Lend Engine',
-//                description: 'Payment',
-//                zipCode: false,
-//                currency: "gbp",
-//                allowRememberMe: false,
-//                email: $(".contact-email").val(),
-//                amount: $(".payment-amount").val()*100
-//            });
-//            e.preventDefault();
-//        });
-//
-//        // Close Checkout on page navigation:
-//        $(window).on('popstate', function() {
-//            if (handler != undefined) {
-//                handler.close();
-//            }
-//        });
+        var handler = StripeCheckout.configure({
+            key: '{{ stripe_public_key }}',
+            locale: 'auto',
+            token: function(token) {
+                $("#stripeToken").val(token.id);
+                $("#plan-form").submit();
+            }
+        });
+
+        $(document).delegate(".plan-subscribe", 'click', function(e) {
+            // Open Checkout with further options:
+            handler.open({
+                name: 'Annex Apps',
+                description: 'Subscription',
+                zipCode: false,
+                currency: 'gbp',
+                amount: 100,
+                email: '{{ tenant.ownerEmail }}',
+                panelLabel: 'Subscribe',
+                allowRememberMe: false
+            });
+            e.preventDefault();
+        });
+
+        // Close Checkout on page navigation:
+        window.addEventListener('popstate', function() {
+            handler.close();
+        });
     </script>
-    {#<script src="https://checkout.stripe.com/checkout.js"></script>#}
 {% endblock %}

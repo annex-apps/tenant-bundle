@@ -25,14 +25,14 @@ class Plan
     /**
      * @var string
      *
-     * @ORM\Column(name="code", type="string", length=16)
+     * @ORM\Column(name="code", type="string", length=32)
      */
     private $code;
 
     /**
-     * @var string
+     * @var integer
      *
-     * @ORM\Column(name="amount", type="decimal", precision=10, scale=2)
+     * @ORM\Column(name="amount", type="integer")
      */
     private $amount;
 
@@ -87,7 +87,7 @@ class Plan
     /**
      * Set amount
      *
-     * @param string $amount
+     * @param integer $amount
      *
      * @return Plan
      */
@@ -101,7 +101,7 @@ class Plan
     /**
      * Get amount
      *
-     * @return string
+     * @return integer
      */
     public function getAmount()
     {

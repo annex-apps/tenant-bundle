@@ -7,6 +7,7 @@
 
 namespace Annex\TenantBundle\Services;
 
+use Annex\TenantBundle\Entity\Plan;
 use Annex\TenantBundle\Entity\Subscription;
 use Annex\TenantBundle\Entity\Tenant;
 use Doctrine\ORM\EntityManager;
@@ -52,10 +53,11 @@ class TenantService
 
     /**
      * @param $subscriptionData
+     * @param Plan $plan
      * @return bool
      * @throws \Exception
      */
-    public function addSubscription($subscriptionData)
+    public function addSubscription($subscriptionData, Plan $plan)
     {
         // Create the subscription locally
         $subscription = new Subscription();
@@ -64,12 +66,47 @@ class TenantService
         $subscription->setCurrency($subscriptionData['plan']['currency']);
         $subscription->setStatus(Subscription::STATUS_ACTIVE);
         $subscription->setStripeId($subscriptionData['id']);
+        $subscription->setPlan($plan);
 
         // Save a new subscription
         $this->coreEntityManager->persist($subscription);
 
+        try {
+            $this->coreEntityManager->flush();
+
+            // Also update the tenant
+            $this->tenant->setSubscription($subscription);
+            $this->coreEntityManager->persist($this->tenant);
+            $this->coreEntityManager->flush();
+
+            return true;
+        } catch (\Exception $e) {
+            throw new \Exception("Could not save subscription: ".$e->getMessage());
+        }
+    }
+
+    /**
+     * @param $id
+     * @return bool
+     * @throws \Exception
+     */
+    public function cancelSubscription($id)
+    {
+        /** @var $repo \Annex\TenantBundle\Repository\SubscriptionRepository */
+        $repo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Subscription');
+
+        /** @var $subscription \Annex\TenantBundle\Entity\Subscription */
+        if (!$subscription = $repo->find($id)) {
+            throw new \Exception("Could not find a subscription with ID {$id}");
+        }
+
+        // Update the status
+        $subscription->setStatus(Subscription::STATUS_CANCELED);
+        $this->coreEntityManager->persist($subscription);
+
         // Also update the tenant
-//        $this->coreEntityManager->persist($this->tenant);
+        $this->tenant->setSubscription(null);
+        $this->coreEntityManager->persist($this->tenant);
 
         try {
             $this->coreEntityManager->flush();
@@ -137,14 +174,19 @@ class TenantService
     }
 
     /**
-     * @return array
+     * @param array $filter
+     * @return array|null|object
      */
-    public function getPlans()
+    public function getPlans($filter = [])
     {
         /** @var $repo \Annex\TenantBundle\Repository\PlanRepository */
         $repo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Plan');
 
-        $plans = $repo->findAll();
+        if (isset($filter['code'])) {
+            $plans = $repo->findOneBy(['code' => $filter['code']]);
+        } else {
+            $plans = $repo->findAll();
+        }
 
         return $plans;
     }

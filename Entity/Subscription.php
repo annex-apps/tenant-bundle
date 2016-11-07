@@ -39,6 +39,14 @@ class Subscription
     private $tenant;
 
     /**
+     * @var Plan
+     *
+     * @ORM\ManyToOne(targetEntity="Plan")
+     * @ORM\JoinColumn(name="plan", referencedColumnName="id", nullable=true)
+     */
+    private $plan;
+
+    /**
      * @var string
      *
      * Stripe statuses:
@@ -49,9 +57,9 @@ class Subscription
     private $status;
 
     /**
-     * @var string
+     * @var integer
      *
-     * @ORM\Column(name="amount", type="decimal", precision=10, scale=2)
+     * @ORM\Column(name="amount", type="integer")
      */
     private $amount;
 
@@ -127,6 +135,30 @@ class Subscription
     }
 
     /**
+     * Set plan
+     *
+     * @param Plan $plan
+     *
+     * @return Subscription
+     */
+    public function setPlan($plan)
+    {
+        $this->plan = $plan;
+
+        return $this;
+    }
+
+    /**
+     * Get plan
+     *
+     * @return Plan
+     */
+    public function getPlan()
+    {
+        return $this->plan;
+    }
+
+    /**
      * Set status
      *
      * @param string $status
@@ -153,7 +185,7 @@ class Subscription
     /**
      * Set amount
      *
-     * @param string $amount
+     * @param integer $amount
      *
      * @return Subscription
      */
@@ -167,7 +199,7 @@ class Subscription
     /**
      * Get amount
      *
-     * @return string
+     * @return integer
      */
     public function getAmount()
     {

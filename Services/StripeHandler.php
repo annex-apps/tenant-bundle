@@ -35,10 +35,9 @@ class StripeHandler
             $this->setApiKey($this->apiKey);
         }
 
-        $curl = new \Stripe\HttpClient\CurlClient(array(CURLOPT_SSLVERSION => 6));
-        \Stripe\ApiRequestor::setHttpClient($curl);
-
-        Stripe::$apiBase = "https://api-tls12.stripe.com";
+//        $curl = new \Stripe\HttpClient\CurlClient(array(CURLOPT_SSLVERSION => 6));
+//        \Stripe\ApiRequestor::setHttpClient($curl);
+//        Stripe::$apiBase = "https://api-tls12.stripe.com";
     }
 
     /**
@@ -67,8 +66,12 @@ class StripeHandler
     public function createCustomer($customer)
     {
         try {
-            $stripeCustomer = \Stripe\Customer::create($customer);
-            return $stripeCustomer;
+            $response = \Stripe\Customer::create($customer);
+            if (isset($response->error)) {
+                $this->errors[] = $response->error->type.' : '.$response->error->message;
+                return false;
+            }
+            return $response;
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
             return false;
@@ -77,17 +80,39 @@ class StripeHandler
 
     /**
      * @param string $stripeCustomerId
-     * @param string $plan
+     * @param string $token
+     * @param string $planCode
      * @return bool|\Stripe\Subscription
      */
-    public function createSubscription($stripeCustomerId, $plan)
+    public function createSubscription($stripeCustomerId, $token, $planCode)
     {
         try {
-            $subscription = \Stripe\Subscription::create([
+            $response = \Stripe\Subscription::create([
                 'customer' => $stripeCustomerId,
-                'plan' => $plan
+                'plan'     => $planCode,
+                'source'   => $token
             ]);
-            return $subscription;
+            if (isset($response->error)) {
+                $this->errors[] = $response->error->type.' : '.$response->error->message;
+                return false;
+            }
+            return $response;
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            return false;
+        }
+    }
+
+    /**
+     * @param $subscriptionId
+     * @return bool
+     */
+    public function cancelSubscription($subscriptionId)
+    {
+        try {
+            $sub = \Stripe\Subscription::retrieve($subscriptionId);
+            $sub->cancel();
+            return true;
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
             return false;
@@ -171,12 +196,75 @@ class StripeHandler
     public function getPlans()
     {
         try {
-            $plans = \Stripe\Plan::all();
-            return $plans;
+            $response = \Stripe\Plan::all();
+            if (isset($response->data)) {
+                $plans = [];
+                foreach ($response->data AS $plan) {
+                    $plans[] = [
+                        'id'     => $plan->id,
+                        'name'   => $plan->name,
+                        'amount' => $plan->amount
+                    ];
+                }
+                return $plans;
+            } else {
+                throw new \Exception("No plans found in Stripe");
+            }
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
             return false;
         }
+    }
+
+    /**
+     * @param $customerId
+     * @param $cardId
+     * @return bool
+     */
+    public function deleteCard($customerId, $cardId)
+    {
+        try {
+            $customer = \Stripe\Customer::retrieve($customerId);
+            $response = $customer->sources->retrieve($cardId)->delete();
+            if (isset($response->deleted) && $response->deleted == true) {
+                return true;
+            } else {
+                throw new \Exception("Could not delete");
+            }
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            return false;
+        }
+    }
+
+    /**
+     * @param $stripeCustomerId
+     * @return array|bool
+     */
+    public function getInvoices($stripeCustomerId)
+    {
+        try {
+            $response = \Stripe\Invoice::all(["customer" => $stripeCustomerId]);
+            if (isset($response->data)) {
+                $invoices = [];
+                foreach ($response->data AS $invoice) {
+                    $invoices[] = [
+                        'id'     => $invoice->id,
+                        'date'   => $invoice->date,
+                        'amount' => $invoice->total,
+                        'period_start' => $invoice->period_start,
+                        'period_end' => $invoice->period_end,
+                    ];
+                }
+                return $invoices;
+            } else {
+                throw new \Exception("No invoices found in Stripe for this customer");
+            }
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            return false;
+        }
+
     }
 
 }
