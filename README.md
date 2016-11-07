@@ -6,7 +6,7 @@ DEV_DB_PASS for dev
 BRIGHTPEARL_SECRET
 
 **Tenant deployment**
-```
+```mysql
 DROP DATABASE IF EXISTS notifier_core;
 DROP DATABASE IF EXISTS notifier_yosemite;
 

@@ -18,16 +18,31 @@ class StripeWebhookController extends Controller
         /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
         $tenantService = $this->get('annex_tenant.tenant_information');
 
-        /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
-        $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
-
         $input = @file_get_contents("php://input");
         $event_json = json_decode($input);
 
-        $this->sendWebhookNotification($event_json);
+        $event = $event_json->data->object;
+
+        $status = 'OK';
+        switch ($event->object) {
+            case "subscription":
+                /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
+                if (!$tenant = $tenantService->getTenantBySubscriptionId($event->id)) {
+                    $status = 'Failed to find by subscription';
+                }
+                break;
+        }
+
+        $responseJson = [
+            'status' => $status,
+            'id'     => $event->id,
+            'event'  => $event->object
+        ];
+
+        $this->sendWebhookNotification( print_r($event_json, true) );
 
         // Thank you Stripe
-        return new JsonResponse(array('status' => 'ok'));
+        return new JsonResponse($responseJson);
     }
 
     private function sendWebhookNotification($messageBody)
@@ -37,7 +52,7 @@ class StripeWebhookController extends Controller
             $message = $this->renderView(
                 'AnnexTenantBundle::emails/basic.html.twig',
                 [
-                    'message' => $messageBody
+                    'message' => '<pre>'.$messageBody.'</pre>'
                 ]
             );
             $client->sendEmail(
@@ -47,7 +62,7 @@ class StripeWebhookController extends Controller
                 $message
             );
         } catch (\Exception $generalException) {
-//            $this->addFlash('error', 'Failed to send email:' . $generalException->getMessage());
+            die("error: ".$generalException->getMessage());
         }
     }
 }

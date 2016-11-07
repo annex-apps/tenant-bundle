@@ -52,6 +52,43 @@ class TenantService
     }
 
     /**
+     * @param $customerId
+     * @return Tenant|null|object
+     * @throws \Exception
+     */
+    public function getTenantByStripeCustomerId($customerId)
+    {
+        /** @var $tenantRepo \Annex\TenantBundle\Repository\TenantRepository */
+        $tenantRepo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Tenant');
+
+        if ($this->tenant = $tenantRepo->findOneBy(['stripeCustomerId' => $customerId])) {
+            return $this->tenant;
+        } else {
+            return false;
+//            throw new \Exception("No tenant found");
+        }
+    }
+
+    /**
+     * @param $subscriptionId
+     * @return Tenant
+     * @throws \Exception
+     */
+    public function getTenantBySubscriptionId($subscriptionId)
+    {
+        /** @var $subscriptionRepo \Annex\TenantBundle\Repository\SubscriptionRepository */
+        $subscriptionRepo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Subscription');
+
+        /** @var $subscription \Annex\TenantBundle\Entity\Subscription */
+        if ($subscription = $subscriptionRepo->findOneBy(['stripeId' => $subscriptionId])) {
+            return $subscription->getTenant();
+        } else {
+            return false;
+//            throw new \Exception("No tenant found using subscription");
+        }
+    }
+
+    /**
      * @param $subscriptionData
      * @param Plan $plan
      * @return bool
