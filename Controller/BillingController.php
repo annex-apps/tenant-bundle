@@ -12,7 +12,7 @@ class BillingController extends Controller
 {
     /**
      * Shows the page with cards and bills
-     * @Route("/admin/billing", name="admin_billing")
+     * @Route("/account/billing", name="account_billing")
      */
     public function billingPageAction(Request $request)
     {
@@ -28,129 +28,43 @@ class BillingController extends Controller
         $stripeService = $this->get('service.stripe');
 
         $cards = [];
-        $bills = [];
+        $invoices = [];
 
         if ($stripeCustomerId = $tenant->getStripeCustomerId()) {
-            $stripeCustomer = $stripeService->getCustomerById($stripeCustomerId);
 
-            if (isset($stripeCustomer['sources']['data'])) {
-                foreach($stripeCustomer['sources']['data'] AS $source) {
+            $stripeCustomer = $stripeService->getCustomerById($stripeCustomerId);
+            if (isset($stripeCustomer->sources->data)) {
+                foreach($stripeCustomer->sources->data AS $source) {
+                    $isDefault = false;
+                    if ($stripeCustomer->default_source == $source->id) {
+                        $isDefault = true;
+                    }
                     $cards[] = [
-                        'last4' => $source['last4'],
-                        'exp_month' => $source['exp_month'],
-                        'exp_year' => $source['exp_year'],
-                        'brand' => $source['brand'],
-                        'id' => $source['id']
+                        'last4'     => $source->last4,
+                        'exp_month' => $source->exp_month,
+                        'exp_year'  => $source->exp_year,
+                        'brand'     => $source->brand,
+                        'id'        => $source->id,
+                        'isDefault' => $isDefault
                     ];
                 }
             }
 
-            $bills = $stripeService->getInvoices($stripeCustomerId);
-        }
+            $invoices = $tenantService->getInvoices();
 
-//        if (!$plans = $stripeService->getPlans()) {
-//            foreach ($stripeService->errors AS $error) {
-//                $this->addFlash('error', $error);
-//            }
-//        }
+        }
 
         return $this->render('AnnexTenantBundle::billing.html.twig', [
             'tenant' => $tenant,
             'cards'  => $cards,
             'plans'  => $plans,
-            'bills'  => $bills,
+            'invoices'  => $invoices,
             'stripe_public_key' => $this->getParameter('stripe_public_key')
         ]);
     }
 
     /**
-     * @Route("/admin/billing/subscription/add", name="subscription_add")
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function addSubscriptionAction(Request $request)
-    {
-
-        /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
-        $tenantService = $this->get('annex_tenant.tenant_information');
-
-        /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
-        $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
-
-        /** @var \Annex\TenantBundle\Services\StripeHandler $stripeService */
-        $stripeService = $this->get('service.stripe');
-
-        $planCode = 'notifier_basic';
-        $plan = $tenantService->getPlans(['code' => $planCode]);
-
-        $token = $request->request->get('stripeToken');
-        $email = $request->request->get('stripeEmail');
-
-        if ($token && $email) {
-
-            // We don't yet have this customer in Stripe, create them
-            if (!$stripeCustomerId = $tenant->getStripeCustomerId()) {
-                $newCustomerData = [
-                    'description' => $tenant->getOwnerName(),
-                    'email'       => $email,
-                    'source'      => $token
-                ];
-                if (!$stripeCustomer = $stripeService->createCustomer($newCustomerData)) {
-                    foreach ($stripeService->errors AS $error) {
-                        $this->addFlash('error', $error);
-                    }
-                    return $this->redirectToRoute('admin_billing');
-                }
-                $stripeCustomerId = $stripeCustomer['id'];
-            }
-
-            // Update the tenant
-            $tenantService->tenant->setStripeCustomerId($stripeCustomerId);
-            $tenantService->updateTenant();
-
-            // Create a subscription
-            if ($subscription = $stripeService->createSubscription($stripeCustomerId, $token, $planCode)) {
-                $tenantService->addSubscription($subscription, $plan);
-                $this->addFlash('success', "You're all set!");
-            } else {
-                foreach ($stripeService->errors AS $error) {
-                    $this->addFlash('error', $error);
-                }
-            }
-
-        }
-
-        return $this->redirectToRoute('admin_billing');
-    }
-
-    /**
-     * @Route("/admin/billing/subscription/cancel", name="subscription_cancel")
-     */
-    public function cancelSubscriptionAction()
-    {
-        /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
-        $tenantService = $this->get('annex_tenant.tenant_information');
-
-        /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
-        $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
-
-        /** @var \Annex\TenantBundle\Services\StripeHandler $stripeService */
-        $stripeService = $this->get('service.stripe');
-
-        if ($stripeService->cancelSubscription( $tenant->getSubscription()->getStripeId() )) {
-            $this->addFlash('success', "Your subscription was cancelled");
-            $tenantService->cancelSubscription( $tenant->getSubscription()->getId() );
-        } else {
-            foreach ($stripeService->errors AS $error) {
-                $this->addFlash('error', $error);
-            }
-        }
-
-        return $this->redirectToRoute('admin_billing');
-    }
-
-    /**
-     * @Route("/admin/billing/card/{cardId}/delete", name="card_delete")
+     * @Route("/account/card/{cardId}/delete", name="card_delete")
      */
     public function deleteCardAction($cardId)
     {
@@ -172,8 +86,61 @@ class BillingController extends Controller
             }
         }
 
-        return $this->redirectToRoute('admin_billing');
-
+        return $this->redirectToRoute('account_billing');
     }
 
+    /**
+     * @Route("/account/card/add", name="card_add")
+     */
+    public function addCardAction(Request $request)
+    {
+        /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
+        $tenantService = $this->get('annex_tenant.tenant_information');
+
+        /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
+        $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
+
+        /** @var \Annex\TenantBundle\Services\StripeHandler $stripeService */
+        $stripeService = $this->get('service.stripe');
+
+        $token = $request->request->get('stripeToken');
+        $email = $request->request->get('stripeEmail');
+
+        if ($token && $email) {
+
+            // We don't yet have this tenant in Stripe, create them
+            // The same email address could exist for another tenant on another app, but that's OK
+            if (!$stripeCustomerId = $tenant->getStripeCustomerId()) {
+                $newCustomerData = [
+                    'description' => $tenant->getOwnerName(),
+                    'email'       => $email
+                ];
+                if (!$stripeCustomer = $stripeService->createCustomer($newCustomerData)) {
+                    foreach ($stripeService->errors AS $error) {
+                        $this->addFlash('error', $error);
+                    }
+                    return $this->redirectToRoute('admin_billing');
+                }
+                $stripeCustomerId = $stripeCustomer->id;
+
+                // Update the tenant
+                $tenantService->tenant->setStripeCustomerId($stripeCustomerId);
+                $tenantService->updateTenant();
+            }
+
+            // Change the card to be used
+            if ($stripeService->changeCard($stripeCustomerId, $token)) {
+                $this->addFlash('success', "Your card details were updated OK");
+            } else {
+                foreach ($stripeService->errors AS $error) {
+                    $this->addFlash('error', $error);
+                }
+            }
+
+        } else {
+            $this->addFlash('error', "No token or email");
+        }
+
+        return $this->redirectToRoute('account_billing');
+    }
 }

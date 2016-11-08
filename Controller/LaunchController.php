@@ -21,7 +21,7 @@ class LaunchController extends Controller
     public function updateDatabase(Request $request)
     {
         $this->updateSchema();
-        return $this->redirect($this->generateUrl('settings'));
+        return $this->redirect($this->generateUrl('account_settings'));
     }
 
     /**

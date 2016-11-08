@@ -72,17 +72,17 @@ class SettingsType extends AbstractType
             'required' => true,
             'attr' => array(
                 'placeholder' => '',
-                'data-help' => 'This can be different from the email address you use to log into Annex Apps.'
+                'data-help' => ''
             )
         ));
 
         $builder->add('org_cellphone', TextType::class, array(
-            'label' => 'Your mobile/cellphone number',
+            'label' => 'Telephone number',
             'data' => $dbData['org_cellphone'],
-            'required' => true,
+            'required' => false,
             'attr' => array(
                 'placeholder' => '',
-                'data-help' => 'So that you can receive SMS messages via the Inventory Notifier app. Enter an international format number including country code; eg +44776522143 for UK or +14156652243 for USA'
+                'data-help' => ''
             )
         ));
 

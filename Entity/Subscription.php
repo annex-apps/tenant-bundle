@@ -80,7 +80,7 @@ class Subscription
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="canceled_at", type="datetime")
+     * @ORM\Column(name="canceled_at", type="datetime", nullable=true)
      */
     private $canceledAt;
 

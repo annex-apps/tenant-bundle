@@ -14,7 +14,7 @@ class SettingsController extends Controller
 {
 
     /**
-     * @Route("admin/settings", name="settings")
+     * @Route("account/settings", name="account_settings")
      */
     public function settingsAction(Request $request)
     {
@@ -55,7 +55,7 @@ class SettingsController extends Controller
                 $this->addFlash('error','Error updating settings.');
             }
 
-            return $this->redirectToRoute('settings');
+            return $this->redirectToRoute('account_settings');
         }
 
         return $this->render('AnnexTenantBundle::settings.html.twig', array(

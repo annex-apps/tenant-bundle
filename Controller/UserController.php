@@ -9,7 +9,7 @@ class UserController extends Controller
 {
 
     /**
-     * @Route("/admin/users", name="user_list")
+     * @Route("/account/users", name="account_users")
      */
     public function userListAction()
     {

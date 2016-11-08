@@ -144,7 +144,7 @@ class CustomConnectionFactory extends ConnectionFactory
             return $_GET['accountCode'];
         }
 
-        // Comment out this section to test the signup process on dev
+        // Comment out this section to test the signup page on dev
         // When you receive the activation email, un-comment this section and then click the link to activate
         if (getenv('SYMFONY_ENV') != 'prod') {
             return 'yosemite';

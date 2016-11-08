@@ -7,91 +7,187 @@
 {% block content %}
 
     {% if tenant.subscription %}
-        <div>
-            You are on {{ tenant.subscription.plan.name }}
-            <a href="{{ path('subscription_cancel') }}" class="card-delete">Cancel my subscription</a>
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <p>
+                    You are on the <strong>{{ tenant.subscription.plan.name }}</strong> plan.
+                </p>
+
+            {% if cards|length > 0 %}
+                <div style="overflow: hidden">
+                    {% for card in cards %}
+                        <span class="creditCard" id="{{ card.id }}">
+                                <span class="creditCardText">
+                                    {{ card.brand }}<br/>
+                                    XXXX XXXX XXXX {{ card.last4 }}<br/>
+                                    {{ card.exp_month }} / {{ card.exp_year }}
+                                </span>
+                                <br/>
+                                <a href="{{ path('card_delete', {cardId: card.id}) }}" class="card-delete">Delete this card</a>
+                            </span>
+                    {% endfor %}
+                    <span class="add-card" style="float: left; width: 300px; text-align: center; padding: 10px;">
+                            <a href="#" id="add-card"><i class="fa fa-plus-circle" style="font-size: 26px;"></i><br>Add a new card</a>
+                            <br>This will replace your existing card
+                        </span>
+                </div>
+            {% else %}
+                <div class="alert alert-danger">
+                    We don't have any cards on record for you.
+                    You still have an active subscription, which will be cancelled at the end of the current billing
+                    period if we can't charge a card. <br><br>
+                    <a href="#" id="add-card" class="btn btn-success">Add a new card</a>
+                </div>
+            {% endif %}
+
+            <form id="add-card-form" action="{{ path('card_add') }}" method="POST">
+                <input type="hidden" name="stripeToken" id="stripeToken">
+                <input type="hidden" name="stripeEmail" id="stripeEmail" value="{{ tenant.ownerEmail }}">
+            </form>
+
+            </div>
         </div>
 
-        <br>
-
-        {% if cards|length > 0 %}
-            <div style="overflow: hidden">
-                {% for card in cards %}
-                    <span class="creditCard" id="{{ card.id }}">
-                        <span class="creditCardText">
-                            {{ card.brand }}<br />
-                            XXXX XXXX XXXX {{ card.last4 }}<br />
-                            {{ card.exp_month }} / {{ card.exp_year }}
-                        </span>
-                        <br />
-                        <a href="{{ path('card_delete', {cardId: card.id}) }}" class="card-delete">Delete this card</a>
-                    </span>
-                {% endfor %}
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Invoices</h4>
+                {% if invoices|length > 0 %}
+                    <table id="tbl-users" class="table table-hover table-striped">
+                        <thead>
+                        <th>Reference</th>
+                        <th>Tax date</th>
+                        <th class="text-right">Amount</th>
+                        <th class="text-right"></th>
+                        </thead>
+                        {% for invoice in invoices %}
+                            <tr>
+                                <td>{{ invoice.id }}</td>
+                                <td>{{ invoice.taxDate|date("d M Y") }}</td>
+                                <td class="text-right">{{ invoice.currency|upper }} {{ (invoice.amount/100)|number_format(2, '.', ',') }}</td>
+                                <td class="text-right"><a target="_blank" href="{{ path('invoice_print', {id: invoice.id}) }}">Print</a></td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% else %}
+                    <div class="alert">
+                        You don't have any invoices yet.
+                    </div>
+                {% endif %}
             </div>
-        {% else %}
-
-            <div class="alert alert-danger">
-                We don't have any cards on record for you.
-                You still have an active subscription, which will be cancelled at the end of the current billing period
-                if we can't charge a card.
-            </div>
-
-        {% endif %}
+        </div>
 
     {% else %}
 
         <div class="alert alert-warning">
-            You don't yet have a subscription
+            You don't yet have a subscription.
         </div>
 
     {% endif %}
 
+
+    <style>
+        .plan-wrapper {
+            border: 1px solid #efefef;
+            background-color: #fefefe;
+            border-radius: 10px;
+            padding: 10px 10px 20px 10px;
+            height: 200px;
+        }
+        .plan-wrapper ul {
+            padding-left: 0;
+            list-style-type: none;
+            color: #ccc;
+        }
+        #billing-faqs ul {
+             padding-left: 0;
+             list-style-type: none;
+         }
+    </style>
+
     <div class="row" id="plans">
-        <form id="plan-form" action="{{ path('subscription_add') }}" method="POST">
-            <input type="hidden" name="stripeToken" id="stripeToken">
-            <input type="hidden" name="stripeEmail" id="stripeEmail" value="{{ tenant.ownerEmail }}">
-        {% for plan in plans %}
-            <div class="col-md-3">
-                <h4>{{ plan.name }}</h4>
-                {% if plan.amount > 0 %}
-                    <button type="submit" class="btn btn-success plan-subscribe">
-                        Get started
-                    </button>
-                {% endif %}
-            </div>
-        {% endfor %}
-        </form>
+        <div class="col-md-12">
+            <h4>Available plans</h4>
+            <br>
+
+            <form id="plan-form" action="{{ path('subscription_add') }}" method="POST">
+                <input type="hidden" name="planCode" id="planCode">
+                <input type="hidden" name="stripeToken" id="stripeToken">
+                <input type="hidden" name="stripeEmail" id="stripeEmail" value="{{ tenant.ownerEmail }}">
+            </form>
+
+            {% for plan in plans %}
+                <div class="col-md-4 text-center">
+                    <div class="plan-wrapper">
+                        <h4>{{ plan.name }}</h4>
+                        <p>
+                            £ {{ (plan.amount/100)|number_format(2, '.', ',') }}
+                            <span style="font-size: 12px; color: #AAA">/month</span>
+                        </p>
+                        <div>
+                            {{ plan.description|raw }}
+                        </div>
+                        {% if tenant.subscription and tenant.subscription.plan.id == plan.id %}
+                            Active
+                        {% else %}
+                            {% if tenant.subscription %}
+                                <a href="{{ path('change_plan', {to: plan.code}) }}" class="btn btn-success">Change to this plan</a>
+                            {% else %}
+                                <a href="#" class="btn btn-success plan-subscribe" data-name="{{ plan.name }}" id="{{ plan.code }}">Subscribe</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
     </div>
 
-    <br>
+    <br><br>
+
+    <div class="row" id="billing-faqs">
+        <div class="col-md-12">
+            <h4>Billing FAQs</h4>
+            <ul>
+                <li>
+                    <h5>Upgrades</h5>
+                    When you change to a higher priced plan during a billing period,
+                    the unused amount left on the previous, lower plan will be credited to your account.
+                    The new, higher plan will be pro-rated based on the remaining time until your next bill is due.
+                    These changes will show on your next monthly invoice.
+                </li>
+                <li>
+                    <h5>Downgrades</h5>
+                    Changing to a lower priced plan will apply a credit for the unused time on the higher plan.
+                    This credit will be applied to your next invoice.
+                </li>
+                <li>
+                    <h5>I don't have a credit or debit card</h5>
+                    We do need you to pay by credit card, since it allows us to automate the billing process
+                    and focus our efforts on providing you with the best apps we can.
+                </li>
+                <li>
+                    <h5>How do I cancel?</h5>
+                    If you want to cancel your subscription, click the link below.
+                    This will remove all record of your card details and deactivate your app.
+                    No refunds will be made.
+                </li>
+                <li>
+                    <h5>Is it safe?</h5>
+                    Yes. We use Stripe.com for credit card billing, and don't ever see or process your card details.
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <br><br>
 
     <div class="row">
         <div class="col-md-12">
-            <h4>Invoices</h4>
-            {% if bills|length > 0 %}
-                <table id="tbl-users" class="table table-hover table-striped">
-                    <thead>
-                    <th>Reference</th>
-                    <th>Date</th>
-                    <th>From</th>
-                    <th>To</th>
-                    <th>Amount</th>
-                    </thead>
-                    {% for bill in bills %}
-                        <tr>
-                            <td>{{ bill.id }}</td>
-                            <td>{{ bill.date|date }}</td>
-                            <td>{{ bill.period_start|date }}</td>
-                            <td>{{ bill.period_end|date }}</td>
-                            <td>{{ bill.amount }}</td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            {% else %}
-                <div class="alert">
-                    You don't have any bills yet.
-                </div>
-            {% endif %}
+            <h4>Do you really want to go?</h4>
+            <a href="{{ path('subscription_cancel') }}" id="subscription-cancel">Cancel my subscription</a>
+            <br>This will de-activate your app. No refunds will be made.
         </div>
     </div>
 
@@ -102,33 +198,68 @@
 {% block javascripts %}
     <script src="https://checkout.stripe.com/checkout.js"></script>
     <script>
-        var handler = StripeCheckout.configure({
+        var subscribeHandler = StripeCheckout.configure({
             key: '{{ stripe_public_key }}',
             locale: 'auto',
-            token: function(token) {
+            token: function (token) {
                 $("#stripeToken").val(token.id);
+                $(".plan-subscribe").attr('disabled', true);
                 $("#plan-form").submit();
             }
         });
 
-        $(document).delegate(".plan-subscribe", 'click', function(e) {
+        $(document).delegate(".plan-subscribe", 'click', function (e) {
+            $("#planCode").val( $(this).attr("id") );
+            var buttonLabel = "Start subscription";
             // Open Checkout with further options:
-            handler.open({
+            subscribeHandler.open({
                 name: 'Annex Apps',
-                description: 'Subscription',
+                description: $(this).data("name")+" subscription",
                 zipCode: false,
                 currency: 'gbp',
-                amount: 100,
+                amount: 0,
                 email: '{{ tenant.ownerEmail }}',
-                panelLabel: 'Subscribe',
+                panelLabel: buttonLabel,
+                allowRememberMe: false
+            });
+            e.preventDefault();
+        });
+
+        var newCardHandler = StripeCheckout.configure({
+            key: '{{ stripe_public_key }}',
+            locale: 'auto',
+            token: function (token) {
+                $("#stripeToken").val(token.id);
+                $("#add-card-form").submit();
+            }
+        });
+
+        $(document).delegate("#add-card", 'click', function (e) {
+            newCardHandler.open({
+                name: 'Annex Apps',
+                description: "Add a new card",
+                zipCode: false,
+                currency: 'gbp',
+                amount: 0,
+                email: '{{ tenant.ownerEmail }}',
+                panelLabel: "Add card",
                 allowRememberMe: false
             });
             e.preventDefault();
         });
 
         // Close Checkout on page navigation:
-        window.addEventListener('popstate', function() {
+        window.addEventListener('popstate', function () {
             handler.close();
+        });
+
+        $(document).delegate("#subscription-cancel", 'click', function (e) {
+            if (window.confirm("Are you sure? This is not reversible and no refunds will be made.")) {
+                return true;
+            } else {
+                e.preventDefault();
+                return false;
+            }
         });
     </script>
 {% endblock %}

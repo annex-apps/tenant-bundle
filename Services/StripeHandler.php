@@ -120,6 +120,24 @@ class StripeHandler
     }
 
     /**
+     * @param $subscriptionId
+     * @param $newPlanCode
+     * @return bool
+     */
+    public function changePlan($subscriptionId, $newPlanCode)
+    {
+        try {
+            $subscription = \Stripe\Subscription::retrieve($subscriptionId);
+            $subscription->plan = $newPlanCode;
+            $subscription->save();
+            return true;
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            return false;
+        }
+    }
+
+    /**
      * @param $token
      * @param $amount
      * @return \Stripe\Charge
@@ -238,6 +256,28 @@ class StripeHandler
     }
 
     /**
+     * @param $customerId
+     * @param $token
+     * @return bool
+     */
+    public function changeCard($customerId, $token)
+    {
+        try {
+            $cu = \Stripe\Customer::retrieve($customerId);
+            $cu->source = $token;
+            $response = $cu->save();
+            if (isset($response->object) && $response->object == 'customer') {
+                return true;
+            } else {
+                throw new \Exception("Could not replace your card");
+            }
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            return false;
+        }
+    }
+
+    /**
      * @param $stripeCustomerId
      * @return array|bool
      */
@@ -251,9 +291,9 @@ class StripeHandler
                     $invoices[] = [
                         'id'     => $invoice->id,
                         'date'   => $invoice->date,
-                        'amount' => $invoice->total,
-                        'period_start' => $invoice->period_start,
-                        'period_end' => $invoice->period_end,
+                        'currency' => strtoupper($invoice->currency),
+                        'amount' => $invoice->total/100,
+                        'isPaid' => $invoice->paid ? "Yes" : "No",
                     ];
                 }
                 return $invoices;
@@ -264,7 +304,21 @@ class StripeHandler
             $this->errors[] = $e->getMessage();
             return false;
         }
+    }
 
+    /**
+     * @param $stripeInvoiceId
+     * @return bool|\Stripe\Invoice
+     */
+    public function getInvoice($stripeInvoiceId)
+    {
+        try {
+            $invoice = \Stripe\Invoice::retrieve($stripeInvoiceId);
+            return $invoice;
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            return false;
+        }
     }
 
 }

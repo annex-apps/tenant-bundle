@@ -44,6 +44,13 @@ class Plan
     private $name;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="description", type="string", length=1024)
+     */
+    private $description;
+
+    /**
      * @var bool
      *
      * @ORM\Column(name="is_active", type="boolean")
@@ -130,6 +137,30 @@ class Plan
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Set description
+     *
+     * @param string $description
+     *
+     * @return Plan
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * Get description
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 
     /**

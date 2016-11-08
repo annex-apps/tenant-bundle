@@ -25,17 +25,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/admin", name="admin_home")
-     */
-    public function dashboardAction(Request $request)
-    {
-        return $this->render('AnnexTenantBundle::dash.html.twig', [
-
-        ]);
-    }
-
-    /**
-     * @Route("/admin/not_installed", name="not_installed")
+     * @Route("/account/not_installed", name="not_installed")
      */
     public function notInstalledAction(Request $request)
     {

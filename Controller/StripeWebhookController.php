@@ -2,6 +2,7 @@
 
 namespace Annex\TenantBundle\Controller;
 
+use Annex\TenantBundle\Entity\Invoice;
 use Postmark\PostmarkClient;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -15,6 +16,8 @@ class StripeWebhookController extends Controller
      */
     public function stripeWebhookAction(Request $request)
     {
+        $em = $this->getDoctrine()->getManager();
+
         /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
         $tenantService = $this->get('annex_tenant.tenant_information');
 
@@ -24,11 +27,18 @@ class StripeWebhookController extends Controller
         $event = $event_json->data->object;
 
         $status = 'OK';
-        switch ($event->object) {
-            case "subscription":
+        switch ($event_json->type) {
+            case "subscription.created":
                 /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
-                if (!$tenant = $tenantService->getTenantBySubscriptionId($event->id)) {
+                if (!$tenant = $tenantService->getTenantByStripeCustomerId($event->customer)) {
                     $status = 'Failed to find by subscription';
+                }
+                break;
+            case "invoice.created":
+                if ($tenant = $tenantService->getTenantByStripeCustomerId($event->customer)) {
+                    $tenantService->addInvoice($event->id);
+                } else {
+                    $status = 'Failed to find tenant using '.$event->customer;
                 }
                 break;
         }
@@ -40,7 +50,7 @@ class StripeWebhookController extends Controller
         ];
 
         $subject = "Webhook: ".$event_json->type;
-        $this->sendWebhookNotification($subject, print_r($event_json, true) );
+        $this->sendWebhookNotification($subject, print_r($responseJson, true).'<hr>'.print_r($input, true) );
 
         // Thank you Stripe
         return new JsonResponse($responseJson);

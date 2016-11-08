@@ -7,6 +7,7 @@
 
 namespace Annex\TenantBundle\Services;
 
+use Annex\TenantBundle\Entity\Invoice;
 use Annex\TenantBundle\Entity\Plan;
 use Annex\TenantBundle\Entity\Subscription;
 use Annex\TenantBundle\Entity\Tenant;
@@ -70,25 +71,6 @@ class TenantService
     }
 
     /**
-     * @param $subscriptionId
-     * @return Tenant
-     * @throws \Exception
-     */
-    public function getTenantBySubscriptionId($subscriptionId)
-    {
-        /** @var $subscriptionRepo \Annex\TenantBundle\Repository\SubscriptionRepository */
-        $subscriptionRepo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Subscription');
-
-        /** @var $subscription \Annex\TenantBundle\Entity\Subscription */
-        if ($subscription = $subscriptionRepo->findOneBy(['stripeId' => $subscriptionId])) {
-            return $subscription->getTenant();
-        } else {
-            return false;
-//            throw new \Exception("No tenant found using subscription");
-        }
-    }
-
-    /**
      * @param $subscriptionData
      * @param Plan $plan
      * @return bool
@@ -123,6 +105,44 @@ class TenantService
     }
 
     /**
+     * @param $stripeInvoiceId
+     * @return bool
+     * @throws \Exception
+     */
+    public function addInvoice($stripeInvoiceId)
+    {
+        // Create the invoice in local DB
+        $invoice = new Invoice();
+        $invoice->setStripeId($stripeInvoiceId);
+        $invoice->setTenant($this->tenant);
+        $this->coreEntityManager->persist($invoice);
+        try {
+            $this->coreEntityManager->flush();
+            return true;
+        } catch (\Exception $e) {
+            throw new \Exception("Could not save invoice: ".$e->getMessage());
+        }
+    }
+
+    /**
+     * @param array $filter
+     * @return array|null|object
+     */
+    public function getInvoices($filter = [])
+    {
+        /** @var $repo \Annex\TenantBundle\Repository\InvoiceRepository */
+        $repo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Invoice');
+
+        if (isset($filter['id'])) {
+            $invoices = $repo->find($filter['id']);
+        } else {
+            $invoices = $repo->findAll();
+        }
+
+        return $invoices;
+    }
+
+    /**
      * @param $id
      * @return bool
      * @throws \Exception
@@ -150,6 +170,33 @@ class TenantService
             return true;
         } catch (\Exception $e) {
             throw new \Exception("Could not save subscription: ".$e->getMessage());
+        }
+    }
+
+    /**
+     * @param string $newPlanCode
+     * @return bool
+     * @throws \Exception
+     */
+    public function changePlan($newPlanCode)
+    {
+        /** @var $repo \Annex\TenantBundle\Repository\PlanRepository */
+        $repo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Plan');
+
+        /** @var $plan \Annex\TenantBundle\Entity\Plan */
+        if (!$plan = $repo->findOneBy(['code' => $newPlanCode])) {
+            throw new \Exception("Could not find a plan with code {$newPlanCode}");
+        }
+
+        $subscription = $this->tenant->getSubscription();
+        $subscription->setPlan($plan);
+        $this->coreEntityManager->persist($subscription);
+
+        try {
+            $this->coreEntityManager->flush();
+            return true;
+        } catch (\Exception $e) {
+            throw new \Exception("Could not update subscription: ".$e->getMessage());
         }
     }
 
@@ -222,7 +269,7 @@ class TenantService
         if (isset($filter['code'])) {
             $plans = $repo->findOneBy(['code' => $filter['code']]);
         } else {
-            $plans = $repo->findAll();
+            $plans = $repo->findBy([], ['amount' => 'ASC']);
         }
 
         return $plans;
