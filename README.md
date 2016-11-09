@@ -22,7 +22,7 @@ ALTER TABLE notifier_core.tenant_subscription ADD CONSTRAINT FK_47105EB2DD5A5B7D
 ALTER TABLE notifier_core.tenant ADD CONSTRAINT FK_4E59C462A3C664D3 FOREIGN KEY (subscription) REFERENCES notifier_core.tenant_subscription (id);
 ALTER TABLE notifier_core.tenant_invoice AUTO_INCREMENT = 1000;
 
-INSERT INTO `notifier_core`.`tenant_plan` (`id`, `code`, `amount`, `name`, `is_active`) VALUES ('1', 'notifier_free', '0', 'Free', '1');
-INSERT INTO `notifier_core`.`tenant_plan` (`id`, `code`, `amount`, `name`, `is_active`) VALUES ('2', 'notifier_test', '100', 'Test', '1');
-INSERT INTO `notifier_core`.`tenant_plan` (`id`, `code`, `amount`, `name`, `is_active`) VALUES ('3', 'notifier_basic', '1000', 'Basic', '1');
+INSERT INTO `notifier_core`.`tenant_plan` (`id`, `code`, `amount`, `name`, `description`, `is_active`) VALUES ('1', 'notifier_free', '0', 'Free', '', '1');
+INSERT INTO `notifier_core`.`tenant_plan` (`id`, `code`, `amount`, `name`, `description`, `is_active`) VALUES ('2', 'notifier_test', '100', 'Test', '', '1');
+INSERT INTO `notifier_core`.`tenant_plan` (`id`, `code`, `amount`, `name`, `description`, `is_active`) VALUES ('3', 'notifier_basic', '1000', 'Basic', '', '1');
 ```
