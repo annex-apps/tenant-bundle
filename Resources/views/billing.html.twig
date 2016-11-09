@@ -86,26 +86,6 @@
 
     {% endif %}
 
-
-    <style>
-        .plan-wrapper {
-            border: 1px solid #efefef;
-            background-color: #fefefe;
-            border-radius: 10px;
-            padding: 10px 10px 20px 10px;
-            height: 200px;
-        }
-        .plan-wrapper ul {
-            padding-left: 0;
-            list-style-type: none;
-            color: #ccc;
-        }
-        #billing-faqs ul {
-             padding-left: 0;
-             list-style-type: none;
-         }
-    </style>
-
     <div class="row" id="plans">
         <div class="col-md-12">
             <h4>Available plans</h4>
@@ -118,7 +98,7 @@
             </form>
 
             {% for plan in plans %}
-                <div class="col-md-4 text-center">
+                <div class="col-md-4">
                     <div class="plan-wrapper">
                         <h4>{{ plan.name }}</h4>
                         <p>

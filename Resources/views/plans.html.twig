@@ -1,0 +1,43 @@
+{% extends 'AnnexTenantBundle::base.html.twig' %}
+
+{% block heading %}Pay plans{% endblock %}
+
+{% block left_nav %}
+    <ul class="nav" id="side-menu" style="margin-top:40px;">
+        <li>
+            <a href="{{ path('plans') }}">View pay plans</a>
+        </li>
+        <li>
+            <a href="{{ path('signup') }}">Create an account</a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+
+            {% for plan in plans %}
+                <div class="col-md-4">
+                    <div class="plan-wrapper">
+                        <h4>{{ plan.name }}</h4>
+                        <p>
+                            £ {{ (plan.amount/100)|number_format(2, '.', ',') }}
+                            <span style="font-size: 12px; color: #AAA">/month</span>
+                        </p>
+                        <div>
+                            {{ plan.description|raw }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}

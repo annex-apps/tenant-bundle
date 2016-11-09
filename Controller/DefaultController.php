@@ -14,13 +14,25 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
+        return $this->render('AnnexTenantBundle::dash.html.twig');
+    }
+
+    /**
+     * @Route("/plans", name="plans")
+     */
+    public function plansAction(Request $request)
+    {
         /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
         $tenantService = $this->get('annex_tenant.tenant_information');
 
+        /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
+        $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
+
         $plans = $tenantService->getPlans();
 
-        return $this->render('AnnexTenantBundle::dash.html.twig', [
-            'plans' => $plans
+        return $this->render('AnnexTenantBundle::plans.html.twig', [
+            'plans' => $plans,
+            'tenant' => $tenant
         ]);
     }
 

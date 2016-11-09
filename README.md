@@ -26,3 +26,13 @@ INSERT INTO `notifier_core`.`tenant_plan` (`id`, `code`, `amount`, `name`, `desc
 INSERT INTO `notifier_core`.`tenant_plan` (`id`, `code`, `amount`, `name`, `description`, `is_active`) VALUES ('2', 'notifier_test', '100', 'Test', '', '1');
 INSERT INTO `notifier_core`.`tenant_plan` (`id`, `code`, `amount`, `name`, `description`, `is_active`) VALUES ('3', 'notifier_basic', '1000', 'Basic', '', '1');
 ```
+
+<ul>
+    <li class="yes"><i class="fa fa-check"></i> 1,000 emails / month</li>
+    <li class="no"><i class="fa fa-times"></i> POST alerts to other systems</li>
+</ul>
+
+<ul>
+    <li class="yes"><i class="fa fa-check"></i> 5,000 emails / month</li>
+    <li class="yes"><i class="fa fa-check"></i> POST alerts to other systems</li>
+</ul>

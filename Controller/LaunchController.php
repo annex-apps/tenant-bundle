@@ -2,6 +2,7 @@
 
 namespace Annex\TenantBundle\Controller;
 
+use Annex\TenantBundle\Entity\Setting;
 use Annex\TenantBundle\Entity\Tenant;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
@@ -54,12 +55,13 @@ class LaunchController extends Controller
         $tenant->setStatus('TRIAL');
 
         if ($tenantService->updateTenant()) {
+
             // We need to already have an empty database
             // Run any migrations that need running
             $this->updateSchema();
             $this->addAdminUser($tenant);
             $this->addUser($tenant);
-
+            $this->setCompanyInformation($tenant);
             $this->sendActivationEmail($tenant);
 
             if ($this->getParameter("kernel.environment") == 'prod') {
@@ -71,6 +73,31 @@ class LaunchController extends Controller
             die("Could not update tenant with token");
         }
 
+    }
+
+    /**
+     * @param Tenant $tenant
+     * @return bool
+     */
+    private function setCompanyInformation(Tenant $tenant)
+    {
+        // Copy tenant information into settings
+        $em = $this->getDoctrine()->getManager();
+
+        $setting1 = new Setting();
+        $setting1->setSetupKey('org_name')->setSetupValue($tenant->getName());
+        $em->persist($setting1);
+
+        $setting2 = new Setting();
+        $setting2->setSetupKey('org_email')->setSetupValue($tenant->getOwnerEmail());
+        $em->persist($setting2);
+
+        try {
+            $em->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**

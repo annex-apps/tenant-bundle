@@ -90,6 +90,7 @@
             <a class="navbar-brand" href="{{ path('homepage') }}">
                 <img class="hidden-xs" src="/images/annex.png" style="width:50px; height: 50px; float: left; margin-top: -18px; margin-right: 10px;">
                 <span>annex</span>
+                <span style="font-size:13px; color: #9dbc6b">Inventory Notifier</span>
             </a>
         </div>
 
@@ -106,10 +107,12 @@
     <div class="container">
         <div class="row">
             <div class="col-md-3" style="min-height: 600px">
+                {% block left_nav %}
                 {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
                     {{ include('AnnexTenantBundle::snippets/app_nav.html.twig') }}
-                    {{ include('AnnexTenantBundle::snippets/admin_nav.html.twig') }}
+                    {{ include('AnnexTenantBundle::snippets/account_nav.html.twig') }}
                 {% endif %}
+                {% endblock %}
             </div>
             <div class="col-md-9">
                 <h1 class="page-header">{% block heading %}Page heading{% endblock %}</h1>

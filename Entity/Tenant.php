@@ -86,6 +86,13 @@ class Tenant
     private $lastAccessAt;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="trial_expires_at", type="datetime", nullable=true)
+     */
+    private $trialExpiresAt;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="status", type="string", length=255)
@@ -247,6 +254,30 @@ class Tenant
     public function getLastAccessAt()
     {
         return $this->lastAccessAt;
+    }
+
+    /**
+     * Set trialExpiresAt
+     *
+     * @param \DateTime $trialExpiresAt
+     *
+     * @return Tenant
+     */
+    public function setTrialExpiresAt($trialExpiresAt)
+    {
+        $this->trialExpiresAt = $trialExpiresAt;
+
+        return $this;
+    }
+
+    /**
+     * Get trialExpiresAt
+     *
+     * @return \DateTime
+     */
+    public function getTrialExpiresAt()
+    {
+        return $this->trialExpiresAt;
     }
 
     /**

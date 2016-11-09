@@ -2,6 +2,17 @@
 
 {% block heading %}Sign up{% endblock %}
 
+{% block left_nav %}
+    <ul class="nav" id="side-menu" style="margin-top:40px;">
+        <li>
+            <a href="{{ path('plans') }}">View pay plans</a>
+        </li>
+        <li>
+            <a href="{{ path('signup') }}">Create an account</a>
+        </li>
+    </ul>
+{% endblock %}
+
 {% block content %}
 
     {% if app.request.get('accountNotFound') %}
@@ -33,10 +44,6 @@
             {{ form_end(form) }}
         </div>
     </div>
-
-    <br>
-    <p>No commitment and no cost until you choose a paid-for plan.</p>
-
 
 {% endblock %}
 

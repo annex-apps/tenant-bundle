@@ -9,3 +9,13 @@
         <a href="{{ path('account_users') }}">Users</a>
     </li>
 </ul>
+
+<br>
+<p class="small" style="padding-left:15px;">
+    {% if tenant.trialExpiresAt %}
+        Your trial expires on<br>
+        <strong>{{ tenant.trialExpiresAt|date("d M Y") }}</strong>
+    {% else %}
+
+    {% endif %}
+</p>
