@@ -95,6 +95,8 @@ class TenantService
 
             // Also update the tenant
             $this->tenant->setSubscription($subscription);
+            $this->tenant->setStatus(Tenant::STATUS_LIVE);
+
             $this->coreEntityManager->persist($this->tenant);
             $this->coreEntityManager->flush();
 
@@ -206,6 +208,8 @@ class TenantService
      */
     private function getCoreEntityManager()
     {
+        $server = null;
+
         if ($url = getenv('RDS_URL')) {
             // Production
             $dbparts  = parse_url($url);
@@ -230,7 +234,7 @@ class TenantService
                 'dbname'   => $this->coreDbName
             );
 
-            $this->coreEntityManager = \Doctrine\ORM\EntityManager::create(
+            $this->coreEntityManager = EntityManager::create(
                 $conn,
                 $this->em->getConfiguration(),
                 $this->em->getEventManager()

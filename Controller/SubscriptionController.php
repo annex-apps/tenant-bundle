@@ -2,8 +2,6 @@
 
 namespace Annex\TenantBundle\Controller;
 
-use Annex\TenantBundle\Entity\Subscription;
-use Postmark\PostmarkClient;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,6 +28,7 @@ class SubscriptionController extends Controller
 
         $planCode = $request->request->get('planCode');
 
+        /** @var $plan \Annex\TenantBundle\Entity\Plan */
         if (!$plan = $tenantService->getPlans(['code' => $planCode])) {
             $this->addFlash('error', "Cannot find a plan with code {$planCode}");
             return $this->redirectToRoute('account_billing');
@@ -55,7 +54,7 @@ class SubscriptionController extends Controller
                 }
                 $stripeCustomerId = $stripeCustomer['id'];
 
-                // Update the tenant
+                // Update the tenant to add the Stripe ID
                 $tenantService->tenant->setStripeCustomerId($stripeCustomerId);
                 $tenantService->updateTenant();
             }

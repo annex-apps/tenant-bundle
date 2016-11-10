@@ -163,13 +163,15 @@
 
     <br><br>
 
-    <div class="row">
-        <div class="col-md-12">
-            <h4>Do you really want to go?</h4>
-            <a href="{{ path('subscription_cancel') }}" id="subscription-cancel">Cancel my subscription</a>
-            <br>This will de-activate your app. No refunds will be made.
+    {% if tenant.subscription %}
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Do you really want to go?</h4>
+                <a href="{{ path('subscription_cancel') }}" id="subscription-cancel">Cancel my subscription</a>
+                <br>This will de-activate your app. No refunds will be made.
+            </div>
         </div>
-    </div>
+    {% endif %}
 
 {% endblock %}
 
