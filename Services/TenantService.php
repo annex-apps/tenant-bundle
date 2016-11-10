@@ -107,16 +107,13 @@ class TenantService
     }
 
     /**
-     * @param $stripeInvoiceId
+     * @param \Annex\TenantBundle\Entity\Invoice $invoice
      * @return bool
      * @throws \Exception
      */
-    public function addInvoice($stripeInvoiceId)
+    public function addInvoice($invoice)
     {
         // Create the invoice in local DB
-        $invoice = new Invoice();
-        $invoice->setStripeId($stripeInvoiceId);
-        $invoice->setTenant($this->tenant);
         $this->coreEntityManager->persist($invoice);
         try {
             $this->coreEntityManager->flush();
@@ -136,10 +133,17 @@ class TenantService
         $repo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Invoice');
 
         if (isset($filter['id'])) {
-            $invoices = $repo->find($filter['id']);
+            $criteria = [
+                'tenant' => $this->tenant->getId(),
+                'id'     => $filter['id']
+            ];
         } else {
-            $invoices = $repo->findAll();
+            $criteria = [
+                'tenant' => $this->tenant->getId()
+            ];
         }
+
+        $invoices = $repo->findBy($criteria);
 
         return $invoices;
     }

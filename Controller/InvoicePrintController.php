@@ -26,10 +26,13 @@ class InvoicePrintController extends Controller
         /** @var \Annex\TenantBundle\Services\StripeHandler $stripeService */
         $stripeService = $this->get('service.stripe');
 
-        if (!$invoice = $tenantService->getInvoices(['id' => $id])) {
+        if (!$invoices = $tenantService->getInvoices(['id' => $id])) {
             $this->addFlash('error', "Could not find an invoice with ID {$id}");
             return $this->redirectToRoute('account_billing');
         }
+
+        // returns one so get the first
+        $invoice = $invoices[0];
 
         /** @var $invoice \Annex\TenantBundle\Entity\Invoice */
         $stripeInvoiceId = $invoice->getStripeId();

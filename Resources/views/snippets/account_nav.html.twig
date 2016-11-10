@@ -1,6 +1,6 @@
 <ul class="nav" id="side-menu" style="margin-top:40px;">
     <li>
-        <a href="{{ path('account_settings') }}">Settings</a>
+        <a href="{{ path('account_settings') }}">Account settings</a>
     </li>
     <li>
         <a href="{{ path('account_billing') }}">Billing</a>
@@ -12,7 +12,7 @@
 
 <br>
 <p class="small" style="padding-left:15px;">
-    {% if tenant.trialExpiresAt %}
+    {% if tenant is defined and tenant.trialExpiresAt %}
         Your trial expires on<br>
         <strong>{{ tenant.trialExpiresAt|date("d M Y") }}</strong>
     {% else %}

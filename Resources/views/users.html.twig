@@ -11,17 +11,21 @@
                     <th>First name</th>
                     <th>Last name</th>
                     <th>Email</th>
-                    <th></th>
+                    <th>&nbsp;</th>
                 </thead>
                 {% for user in users %}
-                    {% if user.id > 1 %}
+                    {% if user.id > 0 %}
                     <tr>
                         <td>{{ user.firstName }}</td>
                         <td>{{ user.lastName }}</td>
                         <td>{{ user.email }}</td>
-                        <td>
+                        <td style="text-align:right ">
                             {% if user.id == app.user.id %}
-                                <a href="{{ path('fos_user_profile_show') }}">My profile</a>
+                                <a href="{{ path('fos_user_change_password') }}">Change password</a>
+                                &nbsp;&nbsp;
+                                <a href="{{ path('fos_user_profile_edit') }}">Update my details</a>
+                            {% else %}
+                                &nbsp;
                             {% endif %}
                         </td>
                     </tr>
@@ -29,6 +33,11 @@
                 {% endfor %}
             </table>
         </div>
+    </div>
+
+    <div class="alert alert-help">
+        These are the users that have access to your account.
+        Not all apps allow multiple users.
     </div>
 
 {% endblock %}

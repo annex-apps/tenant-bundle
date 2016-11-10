@@ -31,12 +31,29 @@ class StripeWebhookController extends Controller
             case "subscription.created":
                 /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
                 if (!$tenant = $tenantService->getTenantByStripeCustomerId($event->customer)) {
-                    $status = 'Failed to find by subscription';
+                    $status = 'Failed to find tenant';
                 }
                 break;
             case "invoice.created":
                 if ($tenant = $tenantService->getTenantByStripeCustomerId($event->customer)) {
-                    $tenantService->addInvoice($event->id);
+
+                    $date = \DateTime::createFromFormat("U", $event->date);
+
+                    /** @var \Stripe\Invoice $event */
+                    $invoice = new Invoice();
+                    $invoice->setCurrency($event->currency);
+                    $invoice->setTenant($tenant);
+                    $invoice->setStripeId($event->id);
+                    $invoice->setAmount($event->total);
+                    $invoice->setIsPaid($event->paid);
+                    $invoice->setTaxDate($date);
+
+                    if ($tenantService->addInvoice($invoice)) {
+                        $status = 'Added invoice OK';
+                    } else {
+                        $status = 'Failed to add invoice';
+                    }
+
                 } else {
                     $status = 'Failed to find tenant using '.$event->customer;
                 }

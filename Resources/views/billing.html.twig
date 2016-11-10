@@ -11,7 +11,7 @@
         <div class="row">
             <div class="col-md-12">
 
-                <p>
+                <p class="alert alert-info">
                     You are on the <strong>{{ tenant.subscription.plan.name }}</strong> plan.
                 </p>
 
@@ -49,6 +49,8 @@
 
             </div>
         </div>
+
+        <br>
 
         <div class="row">
             <div class="col-md-12">
@@ -108,11 +110,12 @@
                         <div>
                             {{ plan.description|raw }}
                         </div>
+                        <br>
                         {% if tenant.subscription and tenant.subscription.plan.id == plan.id %}
-                            Active
+                            <strong>This is your plan</strong>
                         {% else %}
                             {% if tenant.subscription %}
-                                <a href="{{ path('change_plan', {to: plan.code}) }}" class="btn btn-success">Change to this plan</a>
+                                <a href="{{ path('change_plan', {to: plan.code}) }}" class="">Change to this plan</a>
                             {% else %}
                                 <a href="#" class="btn btn-success plan-subscribe" data-name="{{ plan.name }}" id="{{ plan.code }}">Subscribe</a>
                             {% endif %}
@@ -124,11 +127,10 @@
 
     </div>
 
-    <br><br>
-
     <div class="row" id="billing-faqs">
         <div class="col-md-12">
             <h4>Billing FAQs</h4>
+            <br>
             <ul>
                 <li>
                     <h5>Upgrades</h5>

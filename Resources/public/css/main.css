@@ -249,6 +249,7 @@ form .row:first-child .floating-label-form-group {
     border-top: 1px solid #eee;
 }
 
+/*     FOOTER     */
 footer {
     color: #fff;
 }
@@ -298,6 +299,12 @@ footer p {
 .btn:active,
 .btn.active {
     outline: 0;
+}
+
+.alert-help {
+    background-color: #FAFAFA;
+    border: 1px solid #F0F0F0;
+    color: #AAAAAA;
 }
 
 .scroll-top {

@@ -60,13 +60,6 @@ class RegistrationType extends AbstractType
             )
         ));
 
-        $termsUri = '';
-        $builder->add('terms', CheckboxType::class, array(
-            'required' => true,
-            'label' => 'I agree to the <a href="'.$termsUri.'" target="_blank">Terms and Conditions</a>',
-            'mapped' => false
-        ));
-
     }
 
     public function getParent()

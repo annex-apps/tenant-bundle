@@ -26,10 +26,6 @@ class ProfileType extends AbstractType
             'required' => false
         ));
 
-        $builder->add('telephone', TextType::class, array(
-            'required' => false
-        ));
-
         $builder->add('email', TextType::class, array(
             'label' => 'Email address',
             'required' => true,
