@@ -28,7 +28,12 @@ class DefaultController extends Controller
         /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
         $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
 
-        $plans = $tenantService->getPlans();
+        if ($tenant->getBrightpearlDataCentre() == 'ws-eu1') {
+            $currencyCode = 'gbp';
+        } else {
+            $currencyCode = 'usd';
+        }
+        $plans = $tenantService->getPlans(['currency' => $currencyCode]);
 
         return $this->render('AnnexTenantBundle::plans.html.twig', [
             'plans' => $plans,

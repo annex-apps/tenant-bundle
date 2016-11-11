@@ -7,7 +7,8 @@
         {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
             You are logged in as {{ app.user.firstName }} {{ app.user.lastName }}.
         {% else %}
-            Please <a href="{{ path('fos_user_security_login') }}">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a>
+            Please <a href="{{ path('fos_user_security_login') }}">log in</a>
+            or <a href="{{ path('signup') }}">sign up</a> for a new account
         {% endif %}
     </p>
 {% endblock %}

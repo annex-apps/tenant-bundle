@@ -26,6 +26,10 @@ class SignupController extends Controller
 
         $appDomain = $this->getParameter('app_info.domain');
 
+        if (!$trialDays = $this->getParameter('app_info.trial_days')) {
+            $trialDays = 30;
+        }
+
         $form = $this->createForm(SignupType::class, null, []);
 
         $form->handleRequest($request);
@@ -75,6 +79,11 @@ class SignupController extends Controller
                 $tenant->setName($ownerCompany);
                 $tenant->setOwnerEmail($toEmail);
                 $tenant->setOwnerName($ownerName);
+
+                // Trial expiry
+                $trialExpiresAt = new \DateTime();
+                $trialExpiresAt->modify("+{$trialDays} days");
+                $tenant->setTrialExpiresAt($trialExpiresAt);
 
                 $em->persist($tenant);
 
