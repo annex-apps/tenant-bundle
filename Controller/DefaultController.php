@@ -22,17 +22,24 @@ class DefaultController extends Controller
      */
     public function plansAction(Request $request)
     {
+
+        $currencyCode = 'gbp';
+        $tenant       = null;
+
         /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
         $tenantService = $this->get('annex_tenant.tenant_information');
 
         /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
-        $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
+        if ($this->get('session')->get('tenantId')) {
+            $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
 
-        if ($tenant->getBrightpearlDataCentre() == 'ws-eu1') {
-            $currencyCode = 'gbp';
-        } else {
-            $currencyCode = 'usd';
+            if ($tenant->getBrightpearlDataCentre() == 'ws-eu1') {
+                $currencyCode = 'gbp';
+            } else {
+                $currencyCode = 'usd';
+            }
         }
+
         $plans = $tenantService->getPlans(['currency' => $currencyCode]);
 
         return $this->render('AnnexTenantBundle::plans.html.twig', [
