@@ -11,6 +11,14 @@
             <a href="{{ path('signup') }}">Create an account</a>
         </li>
     </ul>
+    <br>
+    <p style="padding-left: 15px;">
+        FREE 14 day trial
+    </p>
+    <p style="padding-left: 15px;" class="small">
+        You'll get a fully-featured trial account to use for 14 days<br><br>
+        When your trial expires, you'll need to choose a pay plan and enter card details to begin monthly billing.
+    </p>
 {% endblock %}
 
 {% block content %}
@@ -23,7 +31,7 @@
                     <div class="plan-wrapper">
                         <h4>{{ plan.name }}</h4>
                         <p>
-                            £ {{ (plan.amount/100)|number_format(2, '.', ',') }}
+                            {{ plan.currency|upper }} {{ (plan.amount/100)|number_format(2, '.', ',') }}
                             <span style="font-size: 12px; color: #AAA">/month</span>
                         </p>
                         <div>

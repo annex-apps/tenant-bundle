@@ -11,11 +11,22 @@
 </ul>
 
 <br>
-<p class="small" style="padding-left:15px;">
-    {% if tenant is defined and tenant.trialExpiresAt %}
-        Your trial expires on<br>
-        <strong>{{ tenant.trialExpiresAt|date("d M Y") }}</strong>
+<div style="padding-left:15px;">
+    {% if tenant is defined and tenant.trialExpiresAt and tenant.status == 'TRIAL' %}
+
+        {% if "now"|date('Y-m-d') > tenant.trialExpiresAt|date("Y-m-d") %}
+            <div class="alert alert-danger">
+                Your trial expired on<br>
+                <strong>{{ tenant.trialExpiresAt|date("d M Y") }}</strong>
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                Your trial expires on<br>
+                <strong>{{ tenant.trialExpiresAt|date("d M Y") }}</strong>
+            </div>
+        {% endif %}
+
     {% else %}
 
     {% endif %}
-</p>
+</div>

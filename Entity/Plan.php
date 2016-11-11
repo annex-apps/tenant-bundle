@@ -46,6 +46,13 @@ class Plan
     /**
      * @var string
      *
+     * @ORM\Column(name="currency", type="string", length=3)
+     */
+    private $currency;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="description", type="string", length=1024)
      */
     private $description;
@@ -185,6 +192,30 @@ class Plan
     public function getIsActive()
     {
         return $this->isActive;
+    }
+
+    /**
+     * Set currency
+     *
+     * @param string $currency
+     *
+     * @return Plan
+     */
+    public function setCurrency($currency)
+    {
+        $this->currency = $currency;
+
+        return $this;
+    }
+
+    /**
+     * Get currency
+     *
+     * @return string
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
     }
 
 }

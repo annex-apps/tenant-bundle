@@ -276,6 +276,8 @@ class TenantService
 
         if (isset($filter['code'])) {
             $plans = $repo->findOneBy(['code' => $filter['code']]);
+        } else if (count($filter) > 0) {
+            $plans = $repo->findBy($filter, ['amount' => 'ASC']);
         } else {
             $plans = $repo->findBy([], ['amount' => 'ASC']);
         }

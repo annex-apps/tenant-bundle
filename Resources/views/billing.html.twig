@@ -104,7 +104,7 @@
                     <div class="plan-wrapper">
                         <h4>{{ plan.name }}</h4>
                         <p>
-                            £ {{ (plan.amount/100)|number_format(2, '.', ',') }}
+                            {{ plan.currency|upper }} {{ (plan.amount/100)|number_format(2, '.', ',') }}
                             <span style="font-size: 12px; color: #AAA">/month</span>
                         </p>
                         <div>

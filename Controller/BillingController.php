@@ -22,7 +22,12 @@ class BillingController extends Controller
         /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
         $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
 
-        $plans = $tenantService->getPlans();
+        if ($tenant->getBrightpearlDataCentre() == 'ws-eu1') {
+            $currencyCode = 'gbp';
+        } else {
+            $currencyCode = 'usd';
+        }
+        $plans = $tenantService->getPlans(['currency' => $currencyCode]);
 
         /** @var \Annex\TenantBundle\Services\StripeHandler $stripeService */
         $stripeService = $this->get('service.stripe');
