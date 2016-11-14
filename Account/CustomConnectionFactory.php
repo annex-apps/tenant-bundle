@@ -145,12 +145,6 @@ class CustomConnectionFactory extends ConnectionFactory
             return $_GET['accountCode'];
         }
 
-        // Comment out this section to test the signup page on dev
-        // When you receive the activation email, un-comment this section and then click the link to activate
-        if (getenv('SYMFONY_ENV') != 'prod') {
-            return 'yosemite';
-        }
-
         // When receiving callbacks from Stripe or other services to the main domain handler
         if (isset($_SERVER['HTTP_HOST'])
             && $_SERVER['HTTP_HOST'] == $this->appUrl
