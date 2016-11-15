@@ -58,7 +58,7 @@
     {% if app.environment == "production" %}
         <script>
             var _rollbarConfig = {
-                accessToken: "5a7c96e680544590bd249841341e6ef5",
+                accessToken: "{{ rollbar_client_token }}",
                 captureUncaught: true,
                 captureUnhandledRejections: true,
                 payload: {
