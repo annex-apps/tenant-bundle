@@ -210,6 +210,9 @@ class LaunchController extends Controller
 
     }
 
+    /**
+     * @return bool
+     */
     public function updateSchema()
     {
         $to = null;

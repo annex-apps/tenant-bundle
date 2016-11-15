@@ -13,11 +13,6 @@ services:
 
 #### ANNEX CORE SERVICES ####
 
-    annex_tenant.settings:
-        class: Annex\TenantBundle\Services\Settings
-        arguments:
-            - "@doctrine.orm.entity_manager"
-
     doctrine.dbal.connection_factory:
         class: Annex\TenantBundle\Account\CustomConnectionFactory
         arguments:
@@ -45,13 +40,11 @@ services:
         class: Annex\TenantBundle\Services\Brightpearl\Contact
         arguments:
             - "@service_container"
-            - "@annex_tenant.settings"
 
     service.brightpearl.order:
         class: Annex\TenantBundle\Services\Brightpearl\Order
         arguments:
             - "@service_container"
-            - "@annex_tenant.settings"
 
     service.brightpearl.utility:
         class: Annex\TenantBundle\Services\Brightpearl\Utility
