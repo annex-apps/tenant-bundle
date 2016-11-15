@@ -160,6 +160,9 @@ class CustomConnectionFactory extends ConnectionFactory
             if ($d[0] != 'localhost:8000' && $d[0] != 'www') {
                 return $d[0];
             }
+        } else {
+            // Running CLI (eg unit tests)
+            return 'yosemite';
         }
 
         return false;
