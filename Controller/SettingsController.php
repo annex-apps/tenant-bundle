@@ -20,12 +20,6 @@ class SettingsController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $options = ['em' => $em];
-        $form = $this->createForm(SettingsType::class, null, $options);
-
-        $form->handleRequest($request);
-
-        /** @var $repo \Annex\TenantBundle\Repository\SettingRepository */
-        $repo =  $em->getRepository('Annex\TenantBundle\Entity\Setting');
 
         /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
         $tenantService = $this->get('annex_tenant.tenant_information');
@@ -33,25 +27,15 @@ class SettingsController extends Controller
         /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
         $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
 
-        if ($form->isSubmitted()) {
+        $form = $this->createForm(SettingsType::class, $tenant, $options);
 
-            foreach ($request->get('settings') AS $setup_key => $setup_data) {
+        $form->handleRequest($request);
 
-                if ($repo->isValidSettingsKey($setup_key)) {
-                    if (!$setting = $repo->findOneBy(['setupKey' => $setup_key])) {
-                        $setting = new Setting();
-                        $setting->setSetupKey($setup_key);
-                    }
-                    $setting->setSetupValue($setup_data);
-                    $em->persist($setting);
-                }
+        if ($form->isSubmitted() && $form->isValid()) {
 
-            }
-
-            try {
-                $em->flush();
+            if ($tenantService->updateTenant()) {
                 $this->addFlash('success','Settings updated.');
-            } catch (\PDOException $e) {
+            } else {
                 $this->addFlash('error','Error updating settings.');
             }
 

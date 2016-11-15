@@ -75,6 +75,9 @@ class SignupController extends Controller
                 $tenant->setBrightpearlAccountCode($subDomain);
                 $tenant->setBrightpearlDataCentre($dataCentre);
 
+                $tenant->setCountry($form->get('country')->getData());
+                $tenant->setTimezone($form->get('timezone')->getData());
+
                 // User info
                 $tenant->setName($ownerCompany);
                 $tenant->setOwnerEmail($toEmail);

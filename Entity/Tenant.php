@@ -59,6 +59,27 @@ class Tenant
     /**
      * @var string
      *
+     * @ORM\Column(name="country", type="string", length=2)
+     */
+    private $country;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="telephone", type="string", length=255, nullable=true)
+     */
+    private $telephone;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="timezone", type="string", length=255)
+     */
+    private $timezone;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="db_schema", type="string", length=255, nullable=true)
      */
     private $dbSchema;
@@ -476,6 +497,66 @@ class Tenant
     public function getSubscription()
     {
         return $this->subscription;
+    }
+
+    /**
+     * @param string $country
+     *
+     * @return Tenant
+     */
+    public function setCountry($country)
+    {
+        $this->country = $country;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+    /**
+     * @param string $timezone
+     *
+     * @return Tenant
+     */
+    public function setTimezone($timezone)
+    {
+        $this->timezone = $timezone;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
+    }
+
+    /**
+     * @param string $telephone
+     *
+     * @return Tenant
+     */
+    public function setTelephone($telephone)
+    {
+        $this->telephone = $telephone;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTelephone()
+    {
+        return $this->telephone;
     }
 
 }

@@ -3,8 +3,10 @@
 namespace Annex\TenantBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class SignupType extends AbstractType
@@ -35,6 +37,24 @@ class SignupType extends AbstractType
             'required' => true,
             'attr' => array(
                 'data-help' => ""
+            )
+        ));
+
+        $builder->add('country', CountryType::class, array(
+            'label' => 'Country',
+            'required' => true,
+            'data' => 'GB',
+            'attr' => array(
+                'placeholder' => '',
+            )
+        ));
+
+        $builder->add('timezone', TimezoneType::class, array(
+            'label' => 'Time zone',
+            'data' => 'Europe/London',
+            'required' => true,
+            'attr' => array(
+                'data-help' => '',
             )
         ));
 

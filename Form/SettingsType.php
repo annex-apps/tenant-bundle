@@ -3,16 +3,11 @@
 namespace Annex\TenantBundle\Form;
 
 use Doctrine\ORM\EntityManager;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
-use Symfony\Component\Form\Extension\Core\Type\CurrencyType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -34,41 +29,39 @@ class SettingsType extends AbstractType
             'No' => 0
         ];
 
-        // Get the settings
-        /** @var $repo \Annex\TenantBundle\Repository\SettingRepository */
-        $repo =  $this->em->getRepository('Annex\TenantBundle\Entity\Setting');
-        $dbData = $repo->getAllSettings();
+        /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
+        $tenant = $builder->getData();
 
-        $builder->add('org_timezone', TimezoneType::class, array(
+        $builder->add('timezone', TimezoneType::class, array(
             'label' => 'Timezone',
             'required' => true,
-            'data' => $dbData['org_timezone'],
+            'data' => $tenant->getTimeZone(),
             'attr' => array(
                 'data-help' => '',
             )
         ));
 
-        $builder->add('org_name', TextType::class, array(
-            'label' => 'Organisation name',
-            'data' => $dbData['org_name'],
+        $builder->add('name', TextType::class, array(
+            'label' => 'Company name',
+            'data' => $tenant->getName(),
             'required' => true,
             'attr' => array(
                 'placeholder' => '',
             )
         ));
 
-        $builder->add('org_country', CountryType::class, array(
-            'label' => 'Organisation country',
-            'data' => $dbData['org_country'],
+        $builder->add('country', CountryType::class, array(
+            'label' => 'Company country',
+            'data' => $tenant->getCountry(),
             'required' => true,
             'attr' => array(
                 'placeholder' => '',
             )
         ));
 
-        $builder->add('org_email', TextType::class, array(
-            'label' => 'Organisation email address',
-            'data' => $dbData['org_email'],
+        $builder->add('ownerEmail', TextType::class, array(
+            'label' => 'Primary contact email address',
+            'data' => $tenant->getOwnerEmail(),
             'required' => true,
             'attr' => array(
                 'placeholder' => '',
@@ -76,9 +69,9 @@ class SettingsType extends AbstractType
             )
         ));
 
-        $builder->add('org_cellphone', TextType::class, array(
+        $builder->add('telephone', TextType::class, array(
             'label' => 'Telephone number',
-            'data' => $dbData['org_cellphone'],
+            'data' => $tenant->getTelephone(),
             'required' => false,
             'attr' => array(
                 'placeholder' => '',
@@ -86,15 +79,6 @@ class SettingsType extends AbstractType
             )
         ));
 
-    }
-
-    /**
-     * Required function for form types
-     * @return string
-     */
-    public function getName()
-    {
-        return "settings";
     }
 
     /**
