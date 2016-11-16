@@ -169,6 +169,7 @@ class TenantService
 
         // Also update the tenant
         $this->tenant->setSubscription(null);
+        $this->tenant->setStatus(Tenant::STATUS_CANCELED);
         $this->coreEntityManager->persist($this->tenant);
 
         try {

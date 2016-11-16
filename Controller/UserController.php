@@ -18,8 +18,15 @@ class UserController extends Controller
         /** @var \Annex\TenantBundle\Repository\ContactRepository $contactRepo */
         $contactRepo = $em->getRepository('AnnexTenantBundle:Contact');
 
+        /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
+        $tenantService = $this->get('annex_tenant.tenant_information');
+
+        /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
+        $tenant = $tenantService->getTenant($this->get('session')->get('tenantId'));
+
         return $this->render('AnnexTenantBundle::users.html.twig', [
-            'users' => $contactRepo->findAll()
+            'users' => $contactRepo->findAll(),
+            'tenant' => $tenant
         ]);
     }
 

@@ -60,11 +60,24 @@ class StripeHandler
     }
 
     /**
-     * @param array $customer
-     * @return \Stripe\Customer
+     * @param $customer
+     * @param bool $searchExistingCustomers
+     * @return bool|\Stripe\Customer
      */
-    public function createCustomer($customer)
+    public function createCustomer($customer, $searchExistingCustomers = true)
     {
+        if (!$customer['email']) {
+            $this->errors[] = "Customer requires an email address.";
+            return false;
+        }
+
+        // First find if we have this email address already
+        if ($searchExistingCustomers == true) {
+            if ($existingCustomer = $this->getCustomerByEmail($customer['email'])) {
+                return $existingCustomer;
+            }
+        }
+
         try {
             $response = \Stripe\Customer::create($customer);
             if (isset($response->error)) {
@@ -72,6 +85,36 @@ class StripeHandler
                 return false;
             }
             return $response;
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+            return false;
+        }
+    }
+
+    /**
+     * @param $email
+     * @return bool
+     */
+    public function getCustomerByEmail($email)
+    {
+        try {
+            $response = \Stripe\Customer::all(['limit' => 100]);
+            if (isset($response->error)) {
+                $this->errors[] = $response->error->type.' : '.$response->error->message;
+                return false;
+            }
+            if (isset($response->data) && count($response->data) > 0) {
+                foreach ($response->data AS $customer) {
+                    if ($customer->email == $email) {
+                        return $customer;
+                    }
+                }
+                // No matches
+                return false;
+            } else {
+                // No customers found
+                return false;
+            }
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
             return false;

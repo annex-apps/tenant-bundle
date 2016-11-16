@@ -50,46 +50,47 @@
             </div>
         </div>
 
-        <br>
-
-        <div class="row">
-            <div class="col-md-12">
-                <h4>Invoices</h4>
-                {% if invoices|length > 0 %}
-                    <table id="tbl-users" class="table table-hover table-striped">
-                        <thead>
-                        <th>Reference</th>
-                        <th>Tax date</th>
-                        <th class="text-right">Amount</th>
-                        <th class="text-right"></th>
-                        </thead>
-                        {% for invoice in invoices %}
-                            <tr>
-                                <td>{{ invoice.id }}</td>
-                                <td>{{ invoice.taxDate|date("d M Y") }}</td>
-                                <td class="text-right">{{ invoice.currency|upper }} {{ (invoice.amount/100)|number_format(2, '.', ',') }}</td>
-                                <td class="text-right"><a target="_blank" href="{{ path('invoice_print', {id: invoice.id}) }}">Print</a></td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                {% else %}
-                    <div class="alert">
-                        You don't have any invoices yet.
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-
     {% else %}
 
         <div class="alert alert-warning">
-            You don't yet have a subscription.
+            You don't have a subscription. Choose a plan below to get started!
         </div>
 
     {% endif %}
 
+    <br>
+    {% if invoices|length > 0 %}
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Invoices</h4>
+
+                <table id="tbl-users" class="table table-hover table-striped">
+                    <thead>
+                    <th>Reference</th>
+                    <th>Tax date</th>
+                    <th class="text-right">Amount</th>
+                    <th class="text-right"></th>
+                    </thead>
+                    {% for invoice in invoices %}
+                        <tr>
+                            <td>{{ invoice.id }}</td>
+                            <td>{{ invoice.taxDate|date("d M Y") }}</td>
+                            <td class="text-right">{{ invoice.currency|upper }} {{ (invoice.amount/100)|number_format(2, '.', ',') }}</td>
+                            <td class="text-right"><a target="_blank" href="{{ path('invoice_print', {id: invoice.id}) }}">Print</a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+            </div>
+        </div>
+    {% else %}
+        <div class="alert">
+            You don't have any invoices yet.
+        </div>
+    {% endif %}
+
     <div class="row" id="plans">
-        <div class="col-md-12">
+        <div class="col-md-12" style="overflow: hidden;">
             <h4>Available plans</h4>
             <br>
 
@@ -127,53 +128,25 @@
 
     </div>
 
-    <div class="row" id="billing-faqs">
-        <div class="col-md-12">
-            <h4>Billing FAQs</h4>
-            <br>
-            <ul>
-                <li>
-                    <h5>Upgrades</h5>
-                    When you change to a higher priced plan during a billing period,
-                    the unused amount left on the previous, lower plan will be credited to your account.
-                    The new, higher plan will be pro-rated based on the remaining time until your next bill is due.
-                    These changes will show on your next monthly invoice.
-                </li>
-                <li>
-                    <h5>Downgrades</h5>
-                    Changing to a lower priced plan will apply a credit for the unused time on the higher plan.
-                    This credit will be applied to your next invoice.
-                </li>
-                <li>
-                    <h5>I don't have a credit or debit card</h5>
-                    We do need you to pay by credit card, since it allows us to automate the billing process
-                    and focus our efforts on providing you with the best apps we can.
-                </li>
-                <li>
-                    <h5>How do I cancel?</h5>
-                    If you want to cancel your subscription, click the link below.
-                    This will remove all record of your card details and deactivate your app.
-                    No refunds will be made.
-                </li>
-                <li>
-                    <h5>Is it safe?</h5>
-                    Yes. We use Stripe.com for credit card billing, and don't ever see or process your card details.
-                </li>
-            </ul>
-        </div>
-    </div>
+    <br>
+    {{ include('AnnexTenantBundle:snippets:billing_faqs.html.twig') }}
 
     <br><br>
 
-    {% if tenant.subscription %}
-        <div class="row">
-            <div class="col-md-12">
-                <h4>Do you really want to go?</h4>
-                <a href="{{ path('subscription_cancel') }}" id="subscription-cancel">Cancel my subscription</a>
-                <br>This will de-activate your app. No refunds will be made.
-            </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Cancel my subscription</h4>
+            {% if tenant.subscription %}
+                <a class="btn btn-danger" href="{{ path('subscription_cancel') }}" id="subscription-cancel">
+                    Cancel my subscription
+                </a>
+                &nbsp;&nbsp;&nbsp;This will de-activate your app. No refunds will be made.
+            {% else %}
+                You have no subscription
+            {% endif %}
         </div>
-    {% endif %}
+    </div>
+
 
 {% endblock %}
 

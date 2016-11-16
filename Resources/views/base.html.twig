@@ -107,12 +107,42 @@
     <div class="container">
         <div class="row">
             <div class="col-md-3" style="min-height: 600px">
+
                 {% block left_nav %}
-                {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
                     {{ include('AnnexTenantBundle::snippets/app_nav.html.twig') }}
-                    {{ include('AnnexTenantBundle::snippets/account_nav.html.twig') }}
-                {% endif %}
+                    {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                        {{ include('AnnexTenantBundle::snippets/account_nav.html.twig') }}
+                    {% endif %}
                 {% endblock %}
+
+                <br>
+                {% if tenant is defined %}
+                <div style="padding-left:15px;">
+                    {% if tenant.status == 'TRIAL' and tenant.trialExpiresAt %}
+                        {% if "now"|date('Y-m-d') > tenant.trialExpiresAt|date("Y-m-d") %}
+                            <div class="alert alert-danger">
+                                Your trial expired on<br>
+                                <strong>{{ tenant.trialExpiresAt|date("d M Y") }}</strong>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                Your trial expires on<br>
+                                <strong>{{ tenant.trialExpiresAt|date("d M Y") }}</strong>
+                            </div>
+                        {% endif %}
+                    {% elseif tenant.status == 'OVERDUE' %}
+                        <div class="alert alert-danger">
+                            Your subscription is overdue because we couldn't charge your card.
+                            Please add a new card.
+                        </div>
+                    {% elseif tenant.status == 'CANCELED' %}
+                        <div class="alert alert-danger">
+                            Your subscription was canceled
+                        </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
             </div>
             <div class="col-md-9">
                 <h1 class="page-header">{% block heading %}Page heading{% endblock %}</h1>

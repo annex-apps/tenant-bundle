@@ -61,6 +61,7 @@ class SubscriptionController extends Controller
 
             // Create a subscription
             if ($subscription = $stripeService->createSubscription($stripeCustomerId, $token, $planCode)) {
+                // Add to tenant and make tenant LIVE
                 $tenantService->addSubscription($subscription, $plan);
                 $this->addFlash('success', "You're all set!");
             } else {

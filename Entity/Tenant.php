@@ -13,9 +13,10 @@ use Doctrine\ORM\Mapping as ORM;
 class Tenant
 {
 
-    const STATUS_PENDING        = 'PENDING'; // When first deployed, ie empty database
-    const STATUS_TRIAL          = 'TRIAL';   // After account is activated and DB is populated
-    const STATUS_LIVE           = 'LIVE';    // When subscription is created
+    const STATUS_PENDING        = 'PENDING';  // When first deployed, ie empty database
+    const STATUS_TRIAL          = 'TRIAL';    // After account is activated and DB is populated
+    const STATUS_LIVE           = 'LIVE';     // When subscription is created
+    const STATUS_CANCELED       = 'CANCELED'; // When subscription is cancelled
     const STATUS_OVERDUE        = 'OVERDUE';
     const STATUS_ARCHIVED       = 'ARCHIVED';
     const STATUS_DELETED        = 'DELETED';

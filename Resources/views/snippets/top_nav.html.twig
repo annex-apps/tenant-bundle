@@ -3,9 +3,6 @@
     {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
 
         <li>
-            <a href="{{ path('account_settings') }}">My Account</a>
-        </li>
-        <li>
             <a href="{{ path('fos_user_security_logout') }}"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
         </li>
 
