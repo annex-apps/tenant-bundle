@@ -62,7 +62,7 @@ class Contact
                 $filters = ['primaryEmail' => $emailAddress];
 
                 $contacts  = $contactService->getContactSearch($this->brightpearlAccountCode, $columns, $filters);
-                $results = $contacts->getResponse()->getResults();
+                $results   = $contacts->getResponse()->getResults();
 
                 if (count($results) == 0) {
                     return false;

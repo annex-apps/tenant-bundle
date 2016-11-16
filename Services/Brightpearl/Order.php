@@ -96,12 +96,17 @@ class Order
                 /** @var \Brightpearl\Client\Model\Order $order */
                 $orders = $orderResponse->getResponse();
 
+                // Init some arrays
+                $shipments     = [];
+                $dropShipNotes = [];
+
                 if (isset($orders[0])) {
 
                     $order = $orders[0];
 
                     $productIds   = [];
                     $itemsShipped = [];
+
                     foreach ($order->getOrderRows() AS $rowId => $row) {
                         $itemsShipped[$row->getProductId()] = null;
                         if (!in_array($row->getProductId(), $productIds)) {
@@ -111,187 +116,212 @@ class Order
 
                     // get item information (eg options)
                     $productService = $this->getProductService();
-                    asort($productIds);
-                    $productsResponse = $productService->getProductIDSet($this->brightpearlAccountCode, implode(',', $productIds));
 
-                    $optionIds      = [];
-                    $optionValueIds = [];
-                    foreach ($productsResponse->getResponse() AS $k => $product) {
-                        /** @var \Brightpearl\Client\Model\Product $product */
-                        if ($product->getVariations()) {
-                            foreach ($product->getVariations() AS $variation) {
-                                /** @var \Brightpearl\Client\Model\ProductVariations $variation */
-                                $optionId = $variation->getOptionId();
-                                $optionValueId = $variation->getOptionValueId();
-                                if (!in_array($optionId, $optionIds)) {
-                                    $optionIds[] = $optionId;
-                                }
-                                if (!in_array($optionValueId, $optionValueIds)) {
-                                    $optionValueIds[] = $optionValueId;
+                    if (count($productIds) > 0) {
+
+                        asort($productIds);
+                        $productsResponse = $productService->getProductIDSet($this->brightpearlAccountCode, implode(',', $productIds));
+
+                        $optionIds      = [];
+                        $optionValueIds = [];
+                        foreach ($productsResponse->getResponse() AS $k => $product) {
+                            /** @var \Brightpearl\Client\Model\Product $product */
+                            if ($product->getVariations()) {
+                                foreach ($product->getVariations() AS $variation) {
+                                    /** @var \Brightpearl\Client\Model\ProductVariations $variation */
+                                    $optionId = $variation->getOptionId();
+                                    $optionValueId = $variation->getOptionValueId();
+                                    if (!in_array($optionId, $optionIds)) {
+                                        $optionIds[] = $optionId;
+                                    }
+                                    if (!in_array($optionValueId, $optionValueIds)) {
+                                        $optionValueIds[] = $optionValueId;
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    // Now get the option value names
-                    $optionValueNamesById = [];
-                    if (count($optionValueIds) > 0) {
-                        foreach ($optionValueIds AS $optionValueId) {
-                            $columns = [];
-                            $filters = ["optionValueId" => $optionValueId];
-                            $options = $productService->getOptionValueSearch($this->brightpearlAccountCode, $columns, $filters);
+                        // Now get the option value names
+                        $optionValueNamesById = [];
+                        if (count($optionValueIds) > 0) {
+                            foreach ($optionValueIds AS $optionValueId) {
+                                $columns = [];
+                                $filters = ["optionValueId" => $optionValueId];
+                                $options = $productService->getOptionValueSearch($this->brightpearlAccountCode, $columns, $filters);
 
-                            $value = $options->getResponse()->getResults();
+                                $value = $options->getResponse()->getResults();
 
-                            $id   = $value[0][2]->scalar;
-                            $name = $value[0][3]->scalar;
-                            $optionValueNamesById[$id] = $name;
-                        }
-                    }
-
-                    // Get information about the products on this order
-                    $productOptionMap = [];
-                    $productNameMap = [];
-                    foreach ($productsResponse->getResponse() AS $k => $product) {
-                        /** @var \Brightpearl\Client\Model\Product $product */
-
-                        $channelInfo = $product->getSalesChannels();
-                        $productNameMap[$product->getId()] = $channelInfo[0]->getProductName();
-
-                        if ($product->getVariations()) {
-                            foreach ($product->getVariations() AS $variation) {
-                                /** @var \Brightpearl\Client\Model\ProductVariations $variation */
-                                $optionValueId = $variation->getOptionValueId();
-                                $productOptionMap[$product->getId()][] = $optionValueNamesById[$optionValueId];
+                                $id   = $value[0][2]->scalar;
+                                $name = $value[0][3]->scalar;
+                                $optionValueNamesById[$id] = $name;
                             }
                         }
-                    }
 
-                    // get the goods out notes for this order to see which items have shipped
-                    $warehouseService = $this->getWarehouseService();
+                        // Get information about the products on this order
+                        $productOptionMap = [];
+                        $productNameMap = [];
+                        foreach ($productsResponse->getResponse() AS $k => $product) {
+                            /** @var \Brightpearl\Client\Model\Product $product */
 
-                    $shipments = [];
-                    $shipMethodIds = [];
+                            $channelInfo = $product->getSalesChannels();
+                            $productNameMap[$product->getId()] = $channelInfo[0]->getProductName();
 
-                    try {
+                            if ($product->getVariations()) {
+                                foreach ($product->getVariations() AS $variation) {
+                                    /** @var \Brightpearl\Client\Model\ProductVariations $variation */
+                                    $optionValueId = $variation->getOptionValueId();
+                                    $productOptionMap[$product->getId()][] = $optionValueNamesById[$optionValueId];
+                                }
+                            }
+                        }
 
-                        $goodsOutNoteGet = $warehouseService->getWarehouseGoodsOutNote($this->brightpearlAccountCode, $orderId, null);
+                        // get the goods out notes for this order to see which items have shipped
+                        $warehouseService = $this->getWarehouseService();
 
-                        if ($goodsOutNoteGet->getResponse()) {
+                        $shipments = [];
+                        $shipMethodIds = [];
 
-                            foreach ($goodsOutNoteGet->getResponse() AS $k => $goodsOutNote) {
-                                /** @var \Brightpearl\Client\Model\GoodsOutNote $goodsOutNote */
+                        try {
 
-                                $goodsOutNoteRows = [];
+                            $goodsOutNoteGet = $warehouseService->getWarehouseGoodsOutNote($this->brightpearlAccountCode, $orderId, null);
 
-                                // Determine the qty shipped
-                                $rows = $goodsOutNote->getOrderRows();
-                                $productId = 0;
-                                foreach ($rows AS $r => $row) {
-                                    $qty = 0;
-                                    $productOptions = '';
-                                    foreach ($row AS $l => $location) {
-                                        $productId = (int)$location->productId;
-                                        $itemsShipped[$productId] += (int)$location->quantity;
-                                        $qty += (int)$location->quantity;
+                            if ($goodsOutNoteGet->getResponse()) {
 
-                                        if (isset($productOptionMap[$productId])) {
-                                            $productOptions = implode(', ', $productOptionMap[$productId]);
+                                foreach ($goodsOutNoteGet->getResponse() AS $k => $goodsOutNote) {
+                                    /** @var \Brightpearl\Client\Model\GoodsOutNote $goodsOutNote */
+
+                                    $goodsOutNoteRows = [];
+
+                                    // Determine the qty shipped
+                                    $rows = $goodsOutNote->getOrderRows();
+                                    $productId = 0;
+                                    foreach ($rows AS $r => $row) {
+                                        $qty = 0;
+                                        $productOptions = '';
+                                        foreach ($row AS $l => $location) {
+                                            $productId = (int)$location->productId;
+                                            $itemsShipped[$productId] += (int)$location->quantity;
+                                            $qty += (int)$location->quantity;
+
+                                            if (isset($productOptionMap[$productId])) {
+                                                $productOptions = implode(', ', $productOptionMap[$productId]);
+                                            }
+                                        }
+                                        $goodsOutNoteRows[] = [
+                                            'productName' => $productNameMap[$productId],
+                                            'options' => $productOptions,
+                                            'quantity' => $qty
+                                        ];
+                                    }
+
+                                    $shipments[] = [
+                                        'id'     => $goodsOutNote->getOrderId().'/'.$goodsOutNote->getSequence(),
+                                        'url'    => '',
+                                        'picked' => $this->formatDate($goodsOutNote->getStatus()->getPickedOn()),
+                                        'packed' => $this->formatDate($goodsOutNote->getStatus()->getPackedOn()),
+                                        'shipped' => $this->formatDate($goodsOutNote->getStatus()->getShippedOn()),
+                                        'reference' => $goodsOutNote->getShipping()->getReference(),
+                                        'shipMethodId' => $goodsOutNote->getShipping()->getShippingMethodId(),
+                                        'rows' => $goodsOutNoteRows
+                                    ];
+
+                                    if ($goodsOutNote->getShipping()->getShippingMethodId() && !in_array($goodsOutNote->getShipping()->getShippingMethodId(), $shipMethodIds)) {
+                                        $shipMethodIds[] = $goodsOutNote->getShipping()->getShippingMethodId();
+                                    }
+
+                                }
+                            }
+
+                        } catch (\Exception $e) {
+                            // 404 means no goods out notes found
+                        }
+
+
+                        // Now get drop ship notes
+                        $dropShipNotes = [];
+                        try {
+
+                            $dropShipNoteGet = $warehouseService->getWarehouseDropShipNote($this->brightpearlAccountCode, $orderId, null);
+
+                            if ($dropShipNoteGet->getResponse()) {
+
+                                foreach ($dropShipNoteGet->getResponse() AS $k => $dropShipNote) {
+                                    /** @var \Brightpearl\Client\Model\DropShipNote $dropShipNote */
+
+                                    $dropShipNoteRows = [];
+
+                                    // Determine the qty shipped
+                                    $rows = $dropShipNote->getOrderRows();
+                                    $productId = 0;
+                                    foreach ($rows AS $r => $row) {
+                                        $qty = 0;
+                                        $productOptions = '';
+                                        foreach ($row AS $l => $location) {
+                                            $productId = (int)$location->productId;
+                                            $itemsShipped[$productId] += (int)$location->quantity;
+                                            $qty += (int)$location->quantity;
+                                            if (isset($productOptionMap[$productId])) {
+                                                $productOptions = implode(', ', $productOptionMap[$productId]);
+                                            }
+                                        }
+                                        $dropShipNoteRows[] = [
+                                            'productName' => $productNameMap[$productId],
+                                            'options' => $productOptions,
+                                            'quantity' => $qty
+                                        ];
+                                    }
+
+                                    $dropShipRef = '';
+                                    $dropShipMethodId = '';
+                                    if ( $dropShipNote->getShipping() ) {
+                                        $dropShipRef = $dropShipNote->getShipping()->getReference();
+                                        $dropShipMethodId = $dropShipNote->getShipping()->getShippingMethodId();
+
+                                        if ($dropShipNote->getShipping()->getShippingMethodId() && !in_array($dropShipNote->getShipping()->getShippingMethodId(), $shipMethodIds)) {
+                                            $shipMethodIds[] = $dropShipNote->getShipping()->getShippingMethodId();
                                         }
                                     }
-                                    $goodsOutNoteRows[] = [
-                                        'productName' => $productNameMap[$productId],
-                                        'options' => $productOptions,
-                                        'quantity' => $qty
+
+                                    $dropShipNotes[] = [
+                                        'id'     => $dropShipNote->getPurchaseOrderId(),
+                                        'url'    => $this->buildOrderUrl($dropShipNote->getPurchaseOrderId()),
+                                        'picked' => '',
+                                        'packed' => '',
+                                        'shipped' => $this->formatDate($dropShipNote->getStatus()->getShippedOn()),
+                                        'reference' => $dropShipRef,
+                                        'shipMethodId' => $dropShipMethodId,
+                                        'rows' => $dropShipNoteRows
                                     ];
+
                                 }
+                            } else {
+                                $this->errors[] = 'No drop ship notes response';
+                            }
 
-                                $shipments[] = [
-                                    'id'     => $goodsOutNote->getOrderId().'/'.$goodsOutNote->getSequence(),
-                                    'url'    => '',
-                                    'picked' => $this->formatDate($goodsOutNote->getStatus()->getPickedOn()),
-                                    'packed' => $this->formatDate($goodsOutNote->getStatus()->getPackedOn()),
-                                    'shipped' => $this->formatDate($goodsOutNote->getStatus()->getShippedOn()),
-                                    'reference' => $goodsOutNote->getShipping()->getReference(),
-                                    'shipMethodId' => $goodsOutNote->getShipping()->getShippingMethodId(),
-                                    'rows' => $goodsOutNoteRows
-                                ];
+                        } catch (\Exception $e) {
+                            // 404 means no drop ship notes found
+                        }
 
-                                if ($goodsOutNote->getShipping()->getShippingMethodId() && !in_array($goodsOutNote->getShipping()->getShippingMethodId(), $shipMethodIds)) {
-                                    $shipMethodIds[] = $goodsOutNote->getShipping()->getShippingMethodId();
-                                }
-
+                        // Get the shipping method names found in the shipments or the drop ship notes
+                        $shippingMethodMap = [];
+                        if (count($shipMethodIds) > 0) {
+                            asort($shipMethodIds);
+                            $shipMethodResponse = $warehouseService->getWarehouseShippingMethods($this->brightpearlAccountCode, implode(',', $shipMethodIds));
+                            foreach ($shipMethodResponse->getResponse() AS $shippingMethod) {
+                                /** @var \Brightpearl\Client\Model\ShippingMethod $shippingMethod */
+                                $id = $shippingMethod->getId();
+                                $name = $shippingMethod->getName();
+                                $shippingMethodMap[$id] = $name;
                             }
                         }
 
-                    } catch (\Exception $e) {
-                        // 404 means no goods out notes found
-                    }
-
-
-                    // Now get drop ship notes
-                    $dropShipNotes = [];
-                    try {
-
-                        $dropShipNoteGet = $warehouseService->getWarehouseDropShipNote($this->brightpearlAccountCode, $orderId, null);
-
-                        if ($dropShipNoteGet->getResponse()) {
-
-                            foreach ($dropShipNoteGet->getResponse() AS $k => $dropShipNote) {
-                                /** @var \Brightpearl\Client\Model\DropShipNote $dropShipNote */
-
-                                $dropShipNoteRows = [];
-
-                                // Determine the qty shipped
-                                $rows = $dropShipNote->getOrderRows();
-                                $productId = 0;
-                                foreach ($rows AS $r => $row) {
-                                    $qty = 0;
-                                    $productOptions = '';
-                                    foreach ($row AS $l => $location) {
-                                        $productId = (int)$location->productId;
-                                        $itemsShipped[$productId] += (int)$location->quantity;
-                                        $qty += (int)$location->quantity;
-                                        if (isset($productOptionMap[$productId])) {
-                                            $productOptions = implode(', ', $productOptionMap[$productId]);
-                                        }
-                                    }
-                                    $dropShipNoteRows[] = [
-                                        'productName' => $productNameMap[$productId],
-                                        'options' => $productOptions,
-                                        'quantity' => $qty
-                                    ];
-                                }
-
-                                $dropShipRef = '';
-                                $dropShipMethodId = '';
-                                if ( $dropShipNote->getShipping() ) {
-                                    $dropShipRef = $dropShipNote->getShipping()->getReference();
-                                    $dropShipMethodId = $dropShipNote->getShipping()->getShippingMethodId();
-
-                                    if ($dropShipNote->getShipping()->getShippingMethodId() && !in_array($dropShipNote->getShipping()->getShippingMethodId(), $shipMethodIds)) {
-                                        $shipMethodIds[] = $dropShipNote->getShipping()->getShippingMethodId();
-                                    }
-                                }
-
-                                $dropShipNotes[] = [
-                                    'id'     => $dropShipNote->getPurchaseOrderId(),
-                                    'url'    => $this->buildOrderUrl($dropShipNote->getPurchaseOrderId()),
-                                    'picked' => '',
-                                    'packed' => '',
-                                    'shipped' => $this->formatDate($dropShipNote->getStatus()->getShippedOn()),
-                                    'reference' => $dropShipRef,
-                                    'shipMethodId' => $dropShipMethodId,
-                                    'rows' => $dropShipNoteRows
-                                ];
-
+                        // Update the shipments
+                        foreach ($shipments AS $key => $shipment) {
+                            if ($shipMethodId = $shipment['shipMethodId']) {
+                                $shipments[$key]['shipMethodName'] = $shippingMethodMap[$shipMethodId];
                             }
-                        } else {
-                            $this->errors[] = 'No drop ship notes response';
                         }
 
-                    } catch (\Exception $e) {
-                        // 404 means no drop ship notes found
                     }
 
                     // Now get the order notes
@@ -310,26 +340,6 @@ class Order
                         }
                     } catch (\Exception $e) {
                         // 404 means no notes found
-                    }
-
-                    // Get the shipping method names found in the shipments or the drop ship notes
-                    $shippingMethodMap = [];
-                    if (count($shipMethodIds) > 0) {
-                        asort($shipMethodIds);
-                        $shipMethodResponse = $warehouseService->getWarehouseShippingMethods($this->brightpearlAccountCode, implode(',', $shipMethodIds));
-                        foreach ($shipMethodResponse->getResponse() AS $shippingMethod) {
-                            /** @var \Brightpearl\Client\Model\ShippingMethod $shippingMethod */
-                            $id = $shippingMethod->getId();
-                            $name = $shippingMethod->getName();
-                            $shippingMethodMap[$id] = $name;
-                        }
-                    }
-
-                    // Update the shipments
-                    foreach ($shipments AS $key => $shipment) {
-                        if ($shipMethodId = $shipment['shipMethodId']) {
-                            $shipments[$key]['shipMethodName'] = $shippingMethodMap[$shipMethodId];
-                        }
                     }
 
                     $rows = [];

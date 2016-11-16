@@ -140,7 +140,8 @@ class CustomConnectionFactory extends ConnectionFactory
     private function determineAccountCode()
     {
         // Launching a new account, clicking activation link in email
-        // Also used for Brightpearl webooks
+        // Brightpearl webooks
+        // Requests from Zendesk app
         if (isset($_GET['accountCode']) && $_GET['accountCode']) {
             return $_GET['accountCode'];
         }
