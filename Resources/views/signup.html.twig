@@ -12,8 +12,8 @@
 {% block content %}
 
     {% if app.request.get('accountNotFound') %}
-        <div class="alert alert-warning">
-            Account "{{ app.request.get('accountNotFound') }}" has not yet been set up. Please register below.
+        <div class="alert alert-info">
+            We don't yet have an Annex Apps account for "{{ app.request.get('accountNotFound') }}". Please register below.
         </div>
     {% endif %}
 
@@ -43,7 +43,7 @@
         </div>
         <div class="col-md-6">
             <br>
-            <div class="alert alert-warning">
+            <div class="alert alert-help">
                 <strong>Note:</strong> <br>
                 You will also need to install this app from within your Brightpearl account.
             </div>

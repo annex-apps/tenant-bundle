@@ -75,8 +75,11 @@ class CustomConnectionFactory extends ConnectionFactory
                 $this->database     = $result[0]['db_schema'];
                 $this->accountId    = $result[0]['id'];
                 $this->session->set('tenantId', $this->accountId);
+            } else if (isset($_SERVER['HTTP_HOST'])) {
+                header("Location: http://".$_SERVER['HTTP_HOST']."/signup?accountNotFound=".$account_code);
+                die();
             } else {
-                die("Account {$account_code} not found.");
+                die("Account {$account_code} not found");
             }
 
         }
