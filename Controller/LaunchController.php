@@ -103,6 +103,7 @@ class LaunchController extends Controller
     }
 
     /**
+     * @param $tenant Tenant
      * Add the root user (to a new account)
      */
     public function addAdminUser($tenant)
@@ -141,7 +142,7 @@ class LaunchController extends Controller
             $client->sendEmail(
                 "Annex Apps <system@annex-apps.com>",
                 'admin@annex-apps.com',
-                "Annex Apps account ".$this->get('session')->get('account_code')." has been deployed.",
+                "Annex Apps account ".$tenant->getBrightpearlAccountCode()." has been deployed.",
                 $message
             );
         } catch (\Exception $generalException) {

@@ -28,10 +28,10 @@ class StripeWebhookController extends Controller
 
         $status = 'OK';
         switch ($event_json->type) {
-            case "subscription.created":
+            case "customer.subscription.created":
                 /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
                 if (!$tenant = $tenantService->getTenantByStripeCustomerId($event->customer)) {
-                    $status = 'Failed to find tenant';
+                    $status = 'Failed to find tenant for new subscription using '.$event->customer;
                 }
                 break;
             case "invoice.created":
@@ -55,7 +55,7 @@ class StripeWebhookController extends Controller
                     }
 
                 } else {
-                    $status = 'Failed to find tenant using '.$event->customer;
+                    $status = 'Failed to find tenant for invoice using '.$event->customer;
                 }
                 break;
         }
