@@ -34,17 +34,6 @@ services:
             - "%app_info.currency%"
 
 #### BRIGHTPEARL HELPER SERVICES ####
-# Allows us to change the API client without changing any other code #
-
-    service.brightpearl.contact:
-        class: Annex\TenantBundle\Services\Brightpearl\Contact
-        arguments:
-            - "@service_container"
-
-    service.brightpearl.order:
-        class: Annex\TenantBundle\Services\Brightpearl\Order
-        arguments:
-            - "@service_container"
 
     service.brightpearl.utility:
         class: Annex\TenantBundle\Services\Brightpearl\Utility
