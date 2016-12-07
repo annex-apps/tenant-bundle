@@ -90,6 +90,11 @@ class Order
 
         } else if ($orderService = $this->getOrderService()) {
 
+            if (!is_numeric($orderId)) {
+                $this->errors[] = "Order ID {$orderId} is not numeric.";
+                return false;
+            }
+
             // Get a single order
             if ($orderResponse = $orderService->getOrdersIDSet($this->brightpearlAccountCode, "{$orderId}")) {
 
@@ -378,9 +383,16 @@ class Order
                         ];
                     }
 
+                    $contactId = null;
+                    if ($order->getParties()->getCustomer()) {
+                        $contactId = $order->getParties()->getCustomer()->getContactId();
+                    } else if ($order->getParties()->getSupplier()) {
+                        $contactId = $order->getParties()->getSupplier()->getContactId();
+                    }
+
                     $order = [
                         'id' => $orderId,
-                        'contactId' => $order->getParties()->getCustomer()->getContactId(),
+                        'contactId' => $contactId,
                         'status' => $order->getOrderStatus()->getName(),
                         'statusColour' => $order->getOrderStatus()->getColor(),
                         'placed' => $this->formatDate($order->getCreatedOn()),
