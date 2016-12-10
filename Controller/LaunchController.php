@@ -230,7 +230,9 @@ class LaunchController extends Controller
 
         $config->setMigrationsTableName('migration_versions');
         $config->setMigrationsNamespace('Application\\Migrations');
-        $config->setMigrationsDirectory('../app/DoctrineMigrations');
+
+        $appPath = $this->container->getParameter('kernel.root_dir');
+        $config->setMigrationsDirectory($appPath.'/DoctrineMigrations');
         $config->registerMigrationsFromDirectory($config->getMigrationsDirectory());
 
         $migration = new Migration($config);

@@ -2,16 +2,10 @@
 
 namespace Annex\TenantBundle\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-class DefaultControllerTest extends WebTestCase
+class CalculatorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testIndex()
+    public function testIndexAction()
     {
-        $client = static::createClient();
 
-        $crawler = $client->request('GET', '/');
-
-        $this->assertContains('Hello World', $client->getResponse()->getContent());
     }
 }

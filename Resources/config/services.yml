@@ -17,6 +17,7 @@ services:
         class: Annex\TenantBundle\Account\CustomConnectionFactory
         arguments:
             - "@session"
+            - "@request_stack"
             - "%app_info.tenant_db%"
             - "%app_info.domain%"
 

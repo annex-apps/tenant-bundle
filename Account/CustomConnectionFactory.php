@@ -9,6 +9,7 @@ use Doctrine\DBAL\Driver\PDOException;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class CustomConnectionFactory extends ConnectionFactory
@@ -21,15 +22,18 @@ class CustomConnectionFactory extends ConnectionFactory
     private $password;
     private $accountId;
 
+    private $request;
+
     /** @var string Used to detect we are on the SSL main heroku domain */
     private $appUrl;
 
     /**
      * @param Session $session
+     * @param RequestStack $request
      * @param $tenantDb
      * @param $appUrl
      */
-    function __construct(Session $session, $tenantDb, $appUrl)
+    function __construct(Session $session, RequestStack $request, $tenantDb, $appUrl)
     {
 
         $this->session  = $session;
@@ -39,6 +43,9 @@ class CustomConnectionFactory extends ConnectionFactory
 
         // The domain of the generic handler eg annex-notifier.herokuapp.com
         $this->appUrl = $appUrl;
+
+        // Request for forcing the tenant core DB when unit testing
+        $this->request = $request;
 
         if ($url = getenv('RDS_URL')) {
             // Production
@@ -147,6 +154,16 @@ class CustomConnectionFactory extends ConnectionFactory
         // Requests from Zendesk app
         if (isset($_GET['accountCode']) && $_GET['accountCode']) {
             return $_GET['accountCode'];
+        }
+
+        if ($this->request->getCurrentRequest() && $this->request->getCurrentRequest()->get('signup-test')) {
+            // Signup form submit which must be to no tenant domain
+            return false;
+        }
+
+        if ($this->request->getCurrentRequest() && $this->request->getCurrentRequest()->get('accountCode')) {
+            // Launch via functional tests
+            return $this->request->getCurrentRequest()->get('accountCode');
         }
 
         // When receiving callbacks from Stripe or other services to the main domain handler
