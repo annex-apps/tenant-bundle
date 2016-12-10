@@ -47,7 +47,12 @@ class LaunchController extends Controller
 
         // Go to Brightpearl to see if this user has installed the app
         if (!$token = $utilityService->getBrightpearlToken($tenant->getBrightpearlAccountCode())) {
-            die("Failed to get install info from Brightpearl");
+            die("Failed to get install info from Brightpearl - please ensure you have installed the app via Brightpearl before activating.");
+        }
+
+        // Already activated
+        if ($tenant->getStatus() == 'TRIAL') {
+            return $this->redirect("http://{$tenant->getBrightpearlAccountCode()}.{$appDomain}/login");
         }
 
         // Save the token into the tenant database
@@ -66,7 +71,7 @@ class LaunchController extends Controller
             if ($this->getParameter("kernel.environment") == 'prod') {
                 return $this->redirect("http://{$tenant->getBrightpearlAccountCode()}.{$appDomain}/login?launched=1");
             } else {
-                return $this->redirect("http://localhost:8000/login?launched=1");
+                return $this->redirect("http://{$tenant->getBrightpearlAccountCode()}.localhost:8000/login?launched=1");
             }
         } else {
             die("Could not update tenant with token");
