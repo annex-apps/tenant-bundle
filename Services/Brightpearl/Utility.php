@@ -43,7 +43,7 @@ class Utility
                 }
             }
         }
-        die('Brightpearl account <strong>'.$brightpearlAccountCode.'</strong> does not have this app installed. Please install the app and try again.');
+        return false;
     }
 
     /**

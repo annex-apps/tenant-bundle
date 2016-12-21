@@ -1,0 +1,49 @@
+{% extends 'AnnexTenantBundle::base.html.twig' %}
+
+{% block heading %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+
+            <table class="table table-hover table-striped table-condensed">
+                <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Status</th>
+                    <th>Created on</th>
+                    <th>Owner</th>
+                </tr>
+                </thead>
+                {% for tenant in tenants %}
+                    <tr>
+                        <td>
+                            <a href="{{ path('tenant_detail', {brightpearlAccountCode: tenant.brightpearlAccountCode}) }}">
+                                {{ tenant.name }}
+                            </a>
+                            <br>
+                            {{ tenant.brightpearlAccountCode }}
+                        </td>
+                        <td>
+                            {{ tenant.status }}
+                            {% if tenant.status == "TRIAL" %}
+                                <br>Expires: {{ tenant.trialExpiresAt|date("d M Y") }}
+                            {% endif %}
+                            {% if tenant.subscription %}
+                                <br>Plan: {{ tenant.subscription.plan.name }}
+                            {% endif %}
+                        </td>
+                        <td>{{ tenant.createdAt|date("d M Y H:i") }}</td>
+                        <td>
+                            {{ tenant.ownerName }}
+                            <br>{{ tenant.ownerEmail }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}{% endblock %}

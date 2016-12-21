@@ -78,15 +78,23 @@ class CustomConnectionFactory extends ConnectionFactory
         if ($account_code = $this->determineAccountCode()) {
 
             if ($result = $this->getAccountInformation($account_code)) {
+
                 // Switch to use the tenant DB
                 $this->database     = $result[0]['db_schema'];
                 $this->accountId    = $result[0]['id'];
                 $this->session->set('tenantId', $this->accountId);
-            } else if (isset($_SERVER['HTTP_HOST'])) {
-                header("Location: http://".$_SERVER['HTTP_HOST']."/signup?accountNotFound=".$account_code);
+
+            } else if (isset($_SERVER['HTTP_HOST']) ) {
+
+                // We're in production and can't find the account, redirect to signup page where we don't need an account
+                header("Location: http://www.".$this->appUrl."/signup?accountNotFound=".$account_code);
                 die();
+
             } else {
-                die("Account {$account_code} not found");
+
+                // Dev env, just die
+                die("Account {$account_code} not found.");
+
             }
 
         }
@@ -131,7 +139,7 @@ class CustomConnectionFactory extends ConnectionFactory
                 brightpearl_account_code,
                 brightpearl_data_centre,
                 brightpearl_token
-              FROM tenant
+              FROM {$this->database}.tenant
               WHERE stub = '{$account_code}'
               LIMIT 1
               ") ){
@@ -177,16 +185,18 @@ class CustomConnectionFactory extends ConnectionFactory
         // Get account from subdomain (will not return anything when called from command line)
         if (isset($_SERVER['HTTP_HOST'])) {
             $d = explode(".",$_SERVER['HTTP_HOST']);
-            // Allowing www as a special case lets us use the domain for signup and helper actions
-            if ($d[0] != 'localhost:8000' && $d[0] != 'www') {
-                return $d[0];
+            if ($d[0] == 'www') {
+                // $this->database is already set to tenantDb
+                return false;
+            } else if ($d[0] == 'admin') {
+                // $this->database is already set to tenantDb
+                return false;
             }
+            return $d[0];
         } else {
             // Running CLI (eg unit tests)
             return 'yosemite';
         }
-
-        return false;
 
     }
 

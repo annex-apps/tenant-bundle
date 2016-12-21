@@ -17,12 +17,17 @@ class LaunchController extends Controller
 {
 
     /**
-     * @Route("update", name="auto_update")
+     * @Route("login_handler", name="login_handler")
      */
     public function updateDatabase(Request $request)
     {
-        $this->updateSchema();
-        return $this->redirect($this->generateUrl('account_settings'));
+        if ($this->get('session')->get('tenantId')) {
+            $this->updateSchema();
+            return $this->redirect($this->generateUrl('account_settings'));
+        } else {
+            // Logged in but no tenant, we are admin
+            return $this->redirect($this->generateUrl('tenant_list'));
+        }
     }
 
     /**
@@ -46,12 +51,14 @@ class LaunchController extends Controller
         $appDomain = $this->getParameter('app_info.tld');
 
         // Go to Brightpearl to see if this user has installed the app
-        if (!$token = $utilityService->getBrightpearlToken($tenant->getBrightpearlAccountCode())) {
-            die("Failed to get install info from Brightpearl - please ensure you have installed the app via Brightpearl before activating.");
+        if (strstr($tenant->getBrightpearlAccountCode(), 'testsignup')) {
+            $token = 'none';
+        } else if (!$token = $utilityService->getBrightpearlToken($tenant->getBrightpearlAccountCode())) {
+            die("Failed to get installation data from Brightpearl - please ensure you have installed the app via Brightpearl before activating.");
         }
 
         // Already activated
-        if ($tenant->getStatus() == 'TRIAL') {
+        if ($tenant->getStatus() != 'PENDING') {
             return $this->redirect("http://{$tenant->getBrightpearlAccountCode()}.{$appDomain}/login");
         }
 

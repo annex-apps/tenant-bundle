@@ -53,6 +53,23 @@ class TenantService
     }
 
     /**
+     * @param $brightpearlAccount
+     * @return Tenant|null|object
+     * @throws \Exception
+     */
+    public function getTenantByBrightpearlAccount($brightpearlAccount)
+    {
+        /** @var $repo \Annex\TenantBundle\Repository\TenantRepository */
+        $tenantRepo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Tenant');
+
+        if ($this->tenant = $tenantRepo->findOneBy(['brightpearlAccountCode' => $brightpearlAccount])) {
+            return $this->tenant;
+        } else {
+            throw new \Exception("No tenant found for {$brightpearlAccount}");
+        }
+    }
+
+    /**
      * @param $customerId
      * @return Tenant|null|object
      * @throws \Exception
