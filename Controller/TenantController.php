@@ -4,15 +4,19 @@ namespace Annex\TenantBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 
 class TenantController extends Controller
 {
     /**
      * @Route("/tenant/list", name="tenant_list")
      */
-    public function homeAction(Request $request)
+    public function tenantListAction()
     {
+        if ($this->get('session')->get('tenantId')) {
+            $this->addFlash('error', "Sorry, no can do.");
+            return $this->redirectToRoute('homepage');
+        }
+
         $em = $this->getDoctrine()->getManager();
         /** @var \Annex\TenantBundle\Repository\TenantRepository $repo */
         $repo = $em->getRepository('AnnexTenantBundle:Tenant');
