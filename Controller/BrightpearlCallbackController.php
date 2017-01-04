@@ -18,7 +18,7 @@ class BrightpearlCallbackController extends Controller
         $accountCode = $request->get("accountCode");
         $appDomain = $this->getParameter('app_info.tld');
         // Redirects user to login if not authenticated
-        return $this->redirect("http://{$accountCode}.{$appDomain}/login");
+        return $this->redirect("http://{$accountCode}.{$appDomain}");
     }
 
     /**
