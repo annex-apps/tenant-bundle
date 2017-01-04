@@ -37,25 +37,31 @@ class BillingController extends Controller
 
         if ($stripeCustomerId = $tenant->getStripeCustomerId()) {
 
-            $stripeCustomer = $stripeService->getCustomerById($stripeCustomerId);
-            if (isset($stripeCustomer->sources->data)) {
-                foreach($stripeCustomer->sources->data AS $source) {
-                    $isDefault = false;
-                    if ($stripeCustomer->default_source == $source->id) {
-                        $isDefault = true;
-                    }
-                    $cards[] = [
-                        'last4'     => $source->last4,
-                        'exp_month' => $source->exp_month,
-                        'exp_year'  => $source->exp_year,
-                        'brand'     => $source->brand,
-                        'id'        => $source->id,
-                        'isDefault' => $isDefault
-                    ];
-                }
-            }
+            try {
 
-            $invoices = $tenantService->getInvoices();
+                $stripeCustomer = $stripeService->getCustomerById($stripeCustomerId);
+                if (isset($stripeCustomer->sources->data)) {
+                    foreach($stripeCustomer->sources->data AS $source) {
+                        $isDefault = false;
+                        if ($stripeCustomer->default_source == $source->id) {
+                            $isDefault = true;
+                        }
+                        $cards[] = [
+                            'last4'     => $source->last4,
+                            'exp_month' => $source->exp_month,
+                            'exp_year'  => $source->exp_year,
+                            'brand'     => $source->brand,
+                            'id'        => $source->id,
+                            'isDefault' => $isDefault
+                        ];
+                    }
+                }
+
+                $invoices = $tenantService->getInvoices();
+
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
 
         }
 

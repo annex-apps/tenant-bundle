@@ -20,6 +20,7 @@ services:
             - "@request_stack"
             - "%app_info.tenant_db%"
             - "%app_info.domain%"
+            - "%app_info.tld%"
 
     annex_tenant.tenant_information:
         class: Annex\TenantBundle\Services\TenantService

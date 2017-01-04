@@ -27,13 +27,16 @@ class CustomConnectionFactory extends ConnectionFactory
     /** @var string Used to detect we are on the SSL main heroku domain */
     private $appUrl;
 
+    /** @var string to redirect to signup when we have no tenant */
+    private $appSignupUrl;
+
     /**
      * @param Session $session
      * @param RequestStack $request
      * @param $tenantDb
      * @param $appUrl
      */
-    function __construct(Session $session, RequestStack $request, $tenantDb, $appUrl)
+    function __construct(Session $session, RequestStack $request, $tenantDb, $appUrl, $appSignupUrl)
     {
 
         $this->session  = $session;
@@ -43,6 +46,9 @@ class CustomConnectionFactory extends ConnectionFactory
 
         // The domain of the generic handler eg annex-notifier.herokuapp.com
         $this->appUrl = $appUrl;
+
+        // www. for signups
+        $this->appSignupUrl = $appSignupUrl;
 
         // Request for forcing the tenant core DB when unit testing
         $this->request = $request;
@@ -87,7 +93,7 @@ class CustomConnectionFactory extends ConnectionFactory
             } else if (isset($_SERVER['HTTP_HOST']) ) {
 
                 // We're in production and can't find the account, redirect to signup page where we don't need an account
-                header("Location: http://www.".$this->appUrl."/signup?accountNotFound=".$account_code);
+                header("Location: http://www.".$this->appSignupUrl."/signup?accountNotFound=".$account_code);
                 die();
 
             } else {
