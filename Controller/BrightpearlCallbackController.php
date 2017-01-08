@@ -2,6 +2,7 @@
 
 namespace Annex\TenantBundle\Controller;
 
+use Postmark\PostmarkClient;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,16 +29,29 @@ class BrightpearlCallbackController extends Controller
     {
 
         // We install by querying Brightpearl post sign-up, so we don't need to use this call from BP
+        $app = $request->get('app');
+        $accountCode = $request->get('accountCode');
+
+        try {
+            $client = new PostmarkClient($this->getParameter('annex.postmark_api_key'));
+            $message = $this->renderView(
+                'AnnexTenantBundle::emails/basic.html.twig',
+                [
+                    'message' => "Install request. App: {$app}, Account: {$accountCode}"
+                ]
+            );
+            $client->sendEmail(
+                "Annex Apps <system@annex-apps.com>",
+                'hello@annex-apps.com',
+                "Install request. App: {$app}, Account: {$accountCode}",
+                $message
+            );
+        } catch (\Exception $generalException) {
+//            return new JsonResponse($generalException->getMessage());
+        }
+
         return new JsonResponse(['Installed']);
 
-//        /** @var \Annex\TenantBundle\Services\Brightpearl\Utility $utilityService */
-//        $utilityService = $this->get('service.brightpearl.utility');
-//
-//        if ($utilityService->installApp()) {
-//            return new JsonResponse(['Installed']);
-//        } else {
-//            return new JsonResponse(['Install failed']);
-//        }
     }
 
     /**
@@ -47,16 +61,29 @@ class BrightpearlCallbackController extends Controller
     {
 
         // We install by querying Brightpearl post sign-up, so we don't need to use this call from BP
+        $app = $request->get('app');
+        $accountCode = $request->get('accountCode');
+
+        try {
+            $client = new PostmarkClient($this->getParameter('annex.postmark_api_key'));
+            $message = $this->renderView(
+                'AnnexTenantBundle::emails/basic.html.twig',
+                [
+                    'message' => "Un-install request. App: {$app}, Account: {$accountCode}"
+                ]
+            );
+            $client->sendEmail(
+                "Annex Apps <system@annex-apps.com>",
+                'hello@annex-apps.com',
+                "Un-install request. App: {$app}, Account: {$accountCode}",
+                $message
+            );
+        } catch (\Exception $generalException) {
+//            return new JsonResponse($generalException->getMessage());
+        }
+
         return new JsonResponse(['Un-Installed']);
 
-//        /** @var \Annex\TenantBundle\Services\Brightpearl\Utility $utilityService */
-//        $utilityService = $this->get('service.brightpearl.utility');
-//
-//        if ($utilityService->unInstallApp()) {
-//            return new JsonResponse(['Un installed']);
-//        } else {
-//            return new JsonResponse(['Un install failed']);
-//        }
     }
 
 }
