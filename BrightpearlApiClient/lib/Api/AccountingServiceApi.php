@@ -946,7 +946,7 @@ class AccountingServiceApi
      *
      * @param string $account_code The account code for the Brightpearl account (required)
      * @param string $id_set ID Set (required)
-     * @return \BrightpearlApiClient\Model\InlineResponse2002
+     * @return \BrightpearlApiClient\Model\JournalGetResponse
      * @throws \BrightpearlApiClient\ApiException on non-2xx response
      */
     public function getAccountingJournalIDSet($account_code, $id_set)
@@ -963,7 +963,7 @@ class AccountingServiceApi
      *
      * @param string $account_code The account code for the Brightpearl account (required)
      * @param string $id_set ID Set (required)
-     * @return Array of Annex\TenantBundle\BrightpearlApiClient\Model\InlineResponse2002, HTTP status code, HTTP response headers (array of strings)
+     * @return Array of Annex\TenantBundle\BrightpearlApiClient\Model\JournalGetResponse, HTTP status code, HTTP response headers (array of strings)
      * @throws \BrightpearlApiClient\ApiException on non-2xx response
      */
     public function getAccountingJournalIDSetWithHttpInfo($account_code, $id_set)
@@ -989,11 +989,8 @@ class AccountingServiceApi
             $headerParams['Accept'] = $_header_accept;
         }
         $headerParams['Content-Type'] = ApiClient::selectHeaderContentType(array('application/json'));
-  
-        
         
         // path params
-        
         if ($account_code !== null) {
             $resourcePath = str_replace(
                 "{" . "ACCOUNT-CODE" . "}",
@@ -1011,9 +1008,6 @@ class AccountingServiceApi
         }
         // default format to json
         $resourcePath = str_replace("{format}", "json", $resourcePath);
-
-        
-        
   
         // for model (json/xml)
         if (isset($_tempBody)) {
@@ -1027,26 +1021,25 @@ class AccountingServiceApi
         if (strlen($apiKey) !== 0) {
             $headerParams['brightpearl-dev-ref'] = $apiKey;
         }
-        
-        
+
         // make the API Call
         try {
             list($response, $statusCode, $httpHeader) = $this->apiClient->callApi(
                 $resourcePath, 'GET',
                 $queryParams, $httpBody,
-                $headerParams, '\BrightpearlApiClient\Model\InlineResponse2002'
+                $headerParams, '\BrightpearlApiClient\Model\JournalGetResponse'
             );
-            
+
             if (!$response) {
                 return array(null, $statusCode, $httpHeader);
             }
 
-            return array(\BrightpearlApiClient\ObjectSerializer::deserialize($response, '\BrightpearlApiClient\Model\InlineResponse2002', $httpHeader), $statusCode, $httpHeader);
+            return array(\BrightpearlApiClient\ObjectSerializer::deserialize($response, '\BrightpearlApiClient\Model\JournalGetResponse', $httpHeader), $statusCode, $httpHeader);
             
         } catch (ApiException $e) {
             switch ($e->getCode()) { 
             case 200:
-                $data = \BrightpearlApiClient\ObjectSerializer::deserialize($e->getResponseBody(), '\BrightpearlApiClient\Model\InlineResponse2002', $e->getResponseHeaders());
+                $data = \BrightpearlApiClient\ObjectSerializer::deserialize($e->getResponseBody(), '\BrightpearlApiClient\Model\JournalGetResponse', $e->getResponseHeaders());
                 $e->setResponseObject($data);
                 break;
             case 404:
