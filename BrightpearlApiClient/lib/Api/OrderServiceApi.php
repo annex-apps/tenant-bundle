@@ -62,11 +62,6 @@ class OrderServiceApi
      */
     function __construct($apiClient = null)
     {
-        if ($apiClient == null) {
-            $apiClient = new ApiClient();
-            $apiClient->getConfig()->setHost('https://api.james-dev-vm.brightpearl.com/public-api');
-        }
-  
         $this->apiClient = $apiClient;
     }
   

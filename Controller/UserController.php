@@ -15,8 +15,8 @@ class UserController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        /** @var \Annex\TenantBundle\Repository\ContactRepository $contactRepo */
-        $contactRepo = $em->getRepository('AnnexTenantBundle:Contact');
+        /** @var \AppBundle\Repository\ContactRepository $contactRepo */
+        $contactRepo = $em->getRepository('AppBundle:Contact');
 
         /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
         $tenantService = $this->get('annex_tenant.tenant_information');

@@ -62,11 +62,6 @@ class ProductServiceApi
      */
     function __construct($apiClient = null)
     {
-        if ($apiClient == null) {
-            $apiClient = new ApiClient();
-            $apiClient->getConfig()->setHost('https://api.james-dev-vm.brightpearl.com/public-api');
-        }
-  
         $this->apiClient = $apiClient;
     }
   
@@ -1021,7 +1016,7 @@ class ProductServiceApi
      * 
      *
      * @param string $account_code The account code for the Brightpearl account (required)
-     * @return \BrightpearlApiClient\Model\InlineResponse20028
+     * @return \BrightpearlApiClient\Model\ChannelGetResponse
      * @throws \BrightpearlApiClient\ApiException on non-2xx response
      */
     public function getChannel($account_code)
@@ -1029,7 +1024,6 @@ class ProductServiceApi
         list($response, $statusCode, $httpHeader) = $this->getChannelWithHttpInfo ($account_code);
         return $response; 
     }
-
 
     /**
      * getChannelWithHttpInfo
@@ -1059,11 +1053,7 @@ class ProductServiceApi
             $headerParams['Accept'] = $_header_accept;
         }
         $headerParams['Content-Type'] = ApiClient::selectHeaderContentType(array('application/json'));
-  
-        
-        
-        // path params
-        
+
         if ($account_code !== null) {
             $resourcePath = str_replace(
                 "{" . "ACCOUNT-CODE" . "}",
@@ -1073,9 +1063,6 @@ class ProductServiceApi
         }
         // default format to json
         $resourcePath = str_replace("{format}", "json", $resourcePath);
-
-        
-        
   
         // for model (json/xml)
         if (isset($_tempBody)) {
@@ -1124,7 +1111,7 @@ class ProductServiceApi
      *
      * @param string $account_code The account code for the Brightpearl account (required)
      * @param string $id_set IDSet (required)
-     * @return \BrightpearlApiClient\Model\InlineResponse20028
+     * @return \BrightpearlApiClient\Model\ChannelGetResponse
      * @throws \BrightpearlApiClient\ApiException on non-2xx response
      */
     public function getChannelIDSet($account_code, $id_set)
@@ -1141,7 +1128,7 @@ class ProductServiceApi
      *
      * @param string $account_code The account code for the Brightpearl account (required)
      * @param string $id_set IDSet (required)
-     * @return Array of Annex\TenantBundle\BrightpearlApiClient\Model\InlineResponse20028, HTTP status code, HTTP response headers (array of strings)
+     * @return Array of Annex\TenantBundle\BrightpearlApiClient\Model\ChannelGetResponse, HTTP status code, HTTP response headers (array of strings)
      * @throws \BrightpearlApiClient\ApiException on non-2xx response
      */
     public function getChannelIDSetWithHttpInfo($account_code, $id_set)
@@ -1167,10 +1154,6 @@ class ProductServiceApi
             $headerParams['Accept'] = $_header_accept;
         }
         $headerParams['Content-Type'] = ApiClient::selectHeaderContentType(array('application/json'));
-  
-        
-        
-        // path params
         
         if ($account_code !== null) {
             $resourcePath = str_replace(
@@ -1190,9 +1173,6 @@ class ProductServiceApi
         // default format to json
         $resourcePath = str_replace("{format}", "json", $resourcePath);
 
-        
-        
-  
         // for model (json/xml)
         if (isset($_tempBody)) {
             $httpBody = $_tempBody; // $_tempBody is the method argument, if present
@@ -1212,19 +1192,19 @@ class ProductServiceApi
             list($response, $statusCode, $httpHeader) = $this->apiClient->callApi(
                 $resourcePath, 'GET',
                 $queryParams, $httpBody,
-                $headerParams, '\BrightpearlApiClient\Model\InlineResponse20028'
+                $headerParams, '\BrightpearlApiClient\Model\ChannelGetResponse'
             );
             
             if (!$response) {
                 return array(null, $statusCode, $httpHeader);
             }
 
-            return array(\BrightpearlApiClient\ObjectSerializer::deserialize($response, '\BrightpearlApiClient\Model\InlineResponse20028', $httpHeader), $statusCode, $httpHeader);
+            return array(\BrightpearlApiClient\ObjectSerializer::deserialize($response, '\BrightpearlApiClient\Model\ChannelGetResponse', $httpHeader), $statusCode, $httpHeader);
             
         } catch (ApiException $e) {
             switch ($e->getCode()) { 
             case 200:
-                $data = \BrightpearlApiClient\ObjectSerializer::deserialize($e->getResponseBody(), '\BrightpearlApiClient\Model\InlineResponse20028', $e->getResponseHeaders());
+                $data = \BrightpearlApiClient\ObjectSerializer::deserialize($e->getResponseBody(), '\BrightpearlApiClient\Model\ChannelGetResponse', $e->getResponseHeaders());
                 $e->setResponseObject($data);
                 break;
             }

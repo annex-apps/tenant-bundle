@@ -15,21 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class LaunchController extends Controller
 {
-
-    /**
-     * @Route("login_handler", name="login_handler")
-     */
-    public function updateDatabase(Request $request)
-    {
-        if ($this->get('session')->get('tenantId')) {
-            $this->updateSchema();
-            return $this->redirect($this->generateUrl('account_settings'));
-        } else {
-            // Logged in but no tenant, we are admin
-            return $this->redirect($this->generateUrl('tenant_list'));
-        }
-    }
-
     /**
      * Signup is required before launch to create an empty database and entry in tenant
      * @Route("launch", name="launch")
@@ -122,7 +107,7 @@ class LaunchController extends Controller
     {
         $manager = $this->get('fos_user.user_manager');
 
-        /** @var \Annex\TenantBundle\Entity\Contact $user */
+        /** @var \AppBundle\Entity\Contact $user */
         $user = $manager->createUser();
 
         $user->setFirstName('Admin');
@@ -186,7 +171,7 @@ class LaunchController extends Controller
 
         $manager = $this->get('fos_user.user_manager');
 
-        /** @var \Annex\TenantBundle\Entity\Contact $user */
+        /** @var \AppBundle\Entity\Contact $user */
         $user = $manager->createUser();
 
         $user->setFirstName( $firstName );

@@ -44,7 +44,7 @@ use \ArrayAccess;
  * @license     http://www.apache.org/licenses/LICENSE-2.0 Apache Licene v2
  * @link        https://github.com/swagger-api/swagger-codegen
  */
-class InlineResponse20028 implements ArrayAccess
+class ChannelGetResponse implements ArrayAccess
 {
     /**
       * Array of property to type mappings. Used for (de)serialization 
