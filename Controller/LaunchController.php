@@ -52,7 +52,6 @@ class LaunchController extends Controller
         $tenant->setStatus('TRIAL');
 
         if ($tenantService->updateTenant()) {
-
             // We need to already have an empty database
             // Run any migrations that need running
             $this->updateSchema();
@@ -253,30 +252,38 @@ class LaunchController extends Controller
     }
 
     /**
-     * @Route("email-test", name="email_test")
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @throws \Exception
+     * @Route("restart", name="restart")
      */
-    public function welcomeTest()
+    public function restartDatabase(Request $request)
     {
-        try {
-            $client = new PostmarkClient($this->getParameter('annex.postmark_api_key'));
-            $message = $this->renderView(
-                'AnnexTenantBundle::emails/welcome.html.twig',
-                [
-                    'email' => 'hello@annex-apps.com',
-                    'password' => 'testpass'
-                ]
-            );
-            $client->sendEmail(
-                "Annex Apps <system@annex-apps.com>",
-                'hello@annex-apps.com',
-                "Your Annex Apps account has been activated.",
-                $message
-            );
-        } catch (\Exception $generalException) {
-            $this->addFlash('error', 'Failed to send email:' . $generalException->getMessage());
+        /** @var \Annex\TenantBundle\Services\TenantService $tenantService */
+        $tenantService = $this->container->get('annex_tenant.tenant_information');
+
+        /** @var $tenant \Annex\TenantBundle\Entity\Tenant */
+        if (!$tenant = $tenantService->getTenantByBrightpearlAccount($request->get('accountCode'))) {
+            die("Could not find an account for ".$request->get('accountCode'));
         }
 
-        return $this->redirect($this->generateUrl('fos_user_security_login'));
+        // restart the journey
+        $tenant->setStatus('PENDING');
+        $tenantService->updateTenant();
+
+        $dbSchema = $this->getParameter('app_info.tenant_db_stub').'_'.$tenant->getBrightpearlAccountCode();
+
+        $connection = $this->get('database_connection');
+        $connection->executeQuery("DROP DATABASE IF EXISTS {$dbSchema}");
+        $connection->executeQuery("CREATE DATABASE {$dbSchema} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+
+        if ($request->get('redirect') == 1) {
+            return $this->redirectToRoute('launch', [
+                'accountCode' => $tenant->getBrightpearlAccountCode()
+            ]);
+        } else {
+            die('Empty database ready.');
+        }
     }
 
 }
