@@ -200,11 +200,12 @@ class CustomConnectionFactory extends ConnectionFactory
                 return false;
             }
             return $d[0];
-        } else if (getenv('DEV_DB_USER')) {
+        } else if ($u = getenv('RDS_URL')) {
+            // We determine the tenant lower in code (eg queue message content)
+            return false;
+        } else {
             // Running CLI (eg unit tests)
             return 'yosemite';
-        } else {
-            return false;
         }
 
     }
