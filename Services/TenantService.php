@@ -32,7 +32,7 @@ class TenantService
         $this->em = $em;
         $this->coreDbName = $coreDbName;
 
-        $this->getEntityManager();
+        $this->getEntityManager($coreDbName);
     }
 
     /**
@@ -262,13 +262,17 @@ class TenantService
                 'dbname'   => $dbName
             );
 
-            $this->coreEntityManager = EntityManager::create(
+            $em = EntityManager::create(
                 $conn,
                 $this->em->getConfiguration(),
                 $this->em->getEventManager()
             );
+            
+            if ($dbName == $this->coreDbName) {
+                $this->coreEntityManager = $em;
+            }
 
-            return $this->coreEntityManager;
+            return $em;
 
         } else {
             throw new \Exception("No username or password found.");

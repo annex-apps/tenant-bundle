@@ -205,6 +205,7 @@ class CustomConnectionFactory extends ConnectionFactory
             return false;
         } else {
             // Running CLI (eg unit tests)
+            return false;
             return 'yosemite';
         }
 
