@@ -200,9 +200,11 @@ class CustomConnectionFactory extends ConnectionFactory
                 return false;
             }
             return $d[0];
-        } else {
+        } else if (getenv('DEV_DB_USER')) {
             // Running CLI (eg unit tests)
             return 'yosemite';
+        } else {
+            return false;
         }
 
     }
