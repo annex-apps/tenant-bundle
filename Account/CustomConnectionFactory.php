@@ -88,6 +88,7 @@ class CustomConnectionFactory extends ConnectionFactory
                 // Switch to use the tenant DB
                 $this->database     = $result[0]['db_schema'];
                 $this->accountId    = $result[0]['id'];
+
                 $this->session->set('tenantId', $this->accountId);
 
             } else if (isset($_SERVER['HTTP_HOST']) ) {

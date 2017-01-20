@@ -32,7 +32,7 @@ class TenantService
         $this->em = $em;
         $this->coreDbName = $coreDbName;
 
-        $this->getCoreEntityManager();
+        $this->getEntityManager();
     }
 
     /**
@@ -225,12 +225,18 @@ class TenantService
     }
 
     /**
+     * @param string $dbName
+     * @return EntityManager
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    private function getCoreEntityManager()
+    public function getEntityManager($dbName = '')
     {
         $server = null;
+        
+        if (!$dbName) {
+            $dbName = $this->coreDbName;
+        }
 
         if ($url = getenv('RDS_URL')) {
             // Production
@@ -253,7 +259,7 @@ class TenantService
                 'host'     => $server,
                 'user'     => $username,
                 'password' => $password,
-                'dbname'   => $this->coreDbName
+                'dbname'   => $dbName
             );
 
             $this->coreEntityManager = EntityManager::create(
@@ -261,6 +267,8 @@ class TenantService
                 $this->em->getConfiguration(),
                 $this->em->getEventManager()
             );
+
+            return $this->coreEntityManager;
 
         } else {
             throw new \Exception("No username or password found.");
