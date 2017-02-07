@@ -267,7 +267,7 @@ class TenantService
                 $this->em->getConfiguration(),
                 $this->em->getEventManager()
             );
-            
+
             if ($dbName == $this->coreDbName) {
                 $this->coreEntityManager = $em;
             }

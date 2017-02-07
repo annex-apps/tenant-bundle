@@ -204,7 +204,7 @@ class CustomConnectionFactory extends ConnectionFactory
             // We determine the tenant lower in code (eg queue message content)
             return false;
         } else {
-            // Running CLI (eg unit tests)
+            // Running CLI (eg unit tests or RabbitMQ consumer)
             return false;
             return 'yosemite';
         }
