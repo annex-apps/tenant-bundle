@@ -17,7 +17,7 @@ class Contact implements ArrayAccess
         'first_name' => 'string',
         'last_name' => 'string',
         'post_address_ids' => '\BrightpearlApiClient\Model\ContactPostAddressIds',
-        'postal_addresses' => '\BrightpearlApiClient\Model\ContactPostalAddresses',
+        'postal_addresses' => '\BrightpearlApiClient\Model\PostalAddress[]',
         'communication' => '\BrightpearlApiClient\Model\ContactCommunication',
         'contact_status' => '\BrightpearlApiClient\Model\ContactContactStatus',
         'relationship_to_account' => '\BrightpearlApiClient\Model\ContactRelationshipToAccount',
@@ -157,7 +157,7 @@ class Contact implements ArrayAccess
     
     /**
       * $postal_addresses 
-      * @var \BrightpearlApiClient\Model\ContactPostalAddresses
+      * @var \BrightpearlApiClient\Model\PostalAddress[]
       */
     protected $postal_addresses;
     
@@ -405,7 +405,7 @@ class Contact implements ArrayAccess
     
     /**
      * Gets postal_addresses
-     * @return \BrightpearlApiClient\Model\ContactPostalAddresses
+     * @return \BrightpearlApiClient\Model\PostalAddress[]
      */
     public function getPostalAddresses()
     {
@@ -414,7 +414,7 @@ class Contact implements ArrayAccess
   
     /**
      * Sets postal_addresses
-     * @param \BrightpearlApiClient\Model\ContactPostalAddresses $postal_addresses
+     * @param \BrightpearlApiClient\Model\PostalAddress[] $postal_addresses
      * @return $this
      */
     public function setPostalAddresses($postal_addresses)
@@ -771,4 +771,5 @@ class Contact implements ArrayAccess
             return json_encode(\BrightpearlApiClient\ObjectSerializer::sanitizeForSerialization($this));
         }
     }
+
 }

@@ -42,6 +42,10 @@ class TenantService
      */
     public function getTenant($tenantId)
     {
+        if (!$tenantId) {
+            throw new \Exception("No tenant ID given for getTenant");
+        }
+
         /** @var $repo \Annex\TenantBundle\Repository\TenantRepository */
         $tenantRepo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Tenant');
 
@@ -50,6 +54,24 @@ class TenantService
         } else {
             throw new \Exception("No tenant found for {$tenantId}");
         }
+    }
+
+    /**
+     * @param $filter
+     * @return \Annex\TenantBundle\Entity\Tenant[]
+     */
+    public function getTenantsWithFilter($filter = [])
+    {
+        /** @var $repo \Annex\TenantBundle\Repository\TenantRepository */
+        $tenantRepo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Tenant');
+
+        if ($filter) {
+            $tenants = $tenantRepo->findBy($filter);
+        } else {
+            $tenants = $tenantRepo->findAll();
+        }
+
+        return $tenants;
     }
 
     /**

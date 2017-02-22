@@ -1622,7 +1622,7 @@ class ContactServiceApi
         }
   
         // parse inputs
-        $resourcePath = "/{ACCOUNT-CODE}/contact-service/contact/{ID-SET}";
+        $resourcePath = "/{ACCOUNT-CODE}/contact-service/contact/{ID-SET}?includeOptional=postalAddresses";
         $httpBody = '';
         $queryParams = array();
         $headerParams = array();

@@ -51,8 +51,6 @@ class PostalAddress implements ArrayAccess
       * @var string[]
       */
     static $swaggerTypes = array(
-        'address_id' => 'int',
-        'contact_id' => 'int',
         'address_line1' => 'string',
         'address_line2' => 'string',
         'address_line3' => 'string',
@@ -67,8 +65,6 @@ class PostalAddress implements ArrayAccess
       * @var string[] 
       */
     static $attributeMap = array(
-        'address_id' => 'addressId',
-        'contact_id' => 'contactId',
         'address_line1' => 'addressLine1',
         'address_line2' => 'addressLine2',
         'address_line3' => 'addressLine3',
@@ -83,8 +79,6 @@ class PostalAddress implements ArrayAccess
       * @var string[]
       */
     static $setters = array(
-        'address_id' => 'setAddressId',
-        'contact_id' => 'setContactId',
         'address_line1' => 'setAddressLine1',
         'address_line2' => 'setAddressLine2',
         'address_line3' => 'setAddressLine3',
@@ -99,8 +93,6 @@ class PostalAddress implements ArrayAccess
       * @var string[]
       */
     static $getters = array(
-        'address_id' => 'getAddressId',
-        'contact_id' => 'getContactId',
         'address_line1' => 'getAddressLine1',
         'address_line2' => 'getAddressLine2',
         'address_line3' => 'getAddressLine3',
@@ -109,19 +101,6 @@ class PostalAddress implements ArrayAccess
         'country_iso_code' => 'getCountryIsoCode',
         'country_id' => 'getCountryId'
     );
-  
-    
-    /**
-      * $address_id 
-      * @var int
-      */
-    protected $address_id;
-    
-    /**
-      * $contact_id 
-      * @var int
-      */
-    protected $contact_id;
     
     /**
       * $address_line1 
@@ -173,8 +152,6 @@ class PostalAddress implements ArrayAccess
     public function __construct(array $data = null)
     {
         if ($data != null) {
-            $this->address_id = $data["address_id"];
-            $this->contact_id = $data["contact_id"];
             $this->address_line1 = $data["address_line1"];
             $this->address_line2 = $data["address_line2"];
             $this->address_line3 = $data["address_line3"];
@@ -183,48 +160,6 @@ class PostalAddress implements ArrayAccess
             $this->country_iso_code = $data["country_iso_code"];
             $this->country_id = $data["country_id"];
         }
-    }
-    
-    /**
-     * Gets address_id
-     * @return int
-     */
-    public function getAddressId()
-    {
-        return $this->address_id;
-    }
-  
-    /**
-     * Sets address_id
-     * @param int $address_id 
-     * @return $this
-     */
-    public function setAddressId($address_id)
-    {
-        
-        $this->address_id = $address_id;
-        return $this;
-    }
-    
-    /**
-     * Gets contact_id
-     * @return int
-     */
-    public function getContactId()
-    {
-        return $this->contact_id;
-    }
-  
-    /**
-     * Sets contact_id
-     * @param int $contact_id 
-     * @return $this
-     */
-    public function setContactId($contact_id)
-    {
-        
-        $this->contact_id = $contact_id;
-        return $this;
     }
     
     /**

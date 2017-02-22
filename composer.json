@@ -1,6 +1,6 @@
 {
   "name": "annex/tenant-bundle",
-  "description": "Bundle for Symfony 3 to handle multi-tenant",
+  "description": "Bundle for Symfony 3 to handle multi-tenancy, with Brightpearl API client",
   "keywords": ["annex"],
   "license": "MIT",
   "type": "bundle",

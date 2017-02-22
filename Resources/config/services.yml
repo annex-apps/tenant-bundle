@@ -18,9 +18,11 @@ services:
         arguments:
             - "@session"
             - "@request_stack"
+            - "%kernel.environment%"
             - "%app_info.tenant_db%"
             - "%app_info.domain%"
             - "%app_info.tld%"
+            - "%app_info.test_account%"
 
     annex_tenant.tenant_information:
         class: Annex\TenantBundle\Services\TenantService

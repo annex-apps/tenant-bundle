@@ -146,6 +146,8 @@ class ApiClient
             $url = ($url . '?' . http_build_query($queryParams) . '&' . $filterParams);
         }
 
+//        dump($url);
+
         if ($method == self::$POST) {
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $postData);

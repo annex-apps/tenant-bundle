@@ -6,9 +6,6 @@ use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Driver\PDOException;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -30,13 +27,21 @@ class CustomConnectionFactory extends ConnectionFactory
     /** @var string to redirect to signup when we have no tenant */
     private $appSignupUrl;
 
+    /** @var string */
+    private $env;
+
+    /** @var string */
+    private $testAccount;
+
     /**
      * @param Session $session
      * @param RequestStack $request
+     * @param $env
      * @param $tenantDb
      * @param $appUrl
+     * @param $appSignupUrl
      */
-    function __construct(Session $session, RequestStack $request, $tenantDb, $appUrl, $appSignupUrl)
+    function __construct(Session $session, RequestStack $request, $env, $tenantDb, $appUrl, $appSignupUrl, $testAccount)
     {
 
         $this->session  = $session;
@@ -52,6 +57,10 @@ class CustomConnectionFactory extends ConnectionFactory
 
         // Request for forcing the tenant core DB when unit testing
         $this->request = $request;
+
+        $this->env = $env;
+
+        $this->testAccount = $testAccount;
 
         if ($url = getenv('RDS_URL')) {
             // Production
@@ -203,10 +212,13 @@ class CustomConnectionFactory extends ConnectionFactory
         } else if ($u = getenv('RDS_URL')) {
             // We determine the tenant lower in code (eg queue message content)
             return false;
+        } else if ($this->env == "test") {
+            // Running unit tests
+            return $this->testAccount;
         } else {
-            // Running CLI (eg unit tests or RabbitMQ consumer)
+            // No account can be found (eg RabbitMQ consumer)
+            // In this case the account to use is within the queue message
             return false;
-            return 'yosemite';
         }
 
     }
