@@ -2,6 +2,8 @@
 
 namespace BrightpearlApiClient;
 
+use Monolog\Logger;
+
 /**
  * Class ApiClient
  * @package BrightpearlApiClient
@@ -22,6 +24,9 @@ class ApiClient
      */
     protected $config;
 
+    /** @var \Monolog\Logger */
+    protected $logger;
+
     /**
      * Object Serializer
      * @var ObjectSerializer
@@ -29,10 +34,10 @@ class ApiClient
     protected $serializer;
 
     /**
-     * Constructor of the class
-     * @param Configuration $config config for this ApiClient
+     * @param Configuration $config
+     * @param Logger $logger
      */
-    public function __construct(Configuration $config = null)
+    public function __construct(Configuration $config = null, Logger $logger)
     {
         if ($config == null) {
             $config = Configuration::getDefaultConfiguration();
@@ -40,6 +45,7 @@ class ApiClient
 
         $this->config = $config;
         $this->serializer = new ObjectSerializer();
+        $this->logger = $logger;
     }
 
     /**
@@ -146,7 +152,7 @@ class ApiClient
             $url = ($url . '?' . http_build_query($queryParams) . '&' . $filterParams);
         }
 
-//        dump($url);
+        $this->logger->debug($url);
 
         if ($method == self::$POST) {
             curl_setopt($curl, CURLOPT_POST, true);
