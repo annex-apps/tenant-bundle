@@ -34,6 +34,7 @@ class LaunchController extends Controller
         $utilityService->setTenant($tenant);
 
         $appDomain = $this->getParameter('app_info.tld');
+        $appName   = $this->getParameter('app_info.name');
 
         // Go to Brightpearl to see if this user has installed the app
         if (strstr($tenant->getBrightpearlAccountCode(), 'testsignup')) {
@@ -55,9 +56,9 @@ class LaunchController extends Controller
             // We need to already have an empty database
             // Run any migrations that need running
             $this->updateSchema();
-            $this->addAdminUser($tenant);
-            $this->addUser($tenant);
-            $this->sendActivationEmail($tenant);
+            $this->addAdminUser($tenant, $appName);
+            $this->addUser($tenant, $appName);
+            $this->sendActivationEmail($tenant, $appName);
 
             if ($this->getParameter("kernel.environment") == 'prod') {
                 return $this->redirect("http://{$tenant->getBrightpearlAccountCode()}.{$appDomain}/login?launched=1");
@@ -73,7 +74,7 @@ class LaunchController extends Controller
     /**
      * @param \Annex\TenantBundle\Entity\Tenant $tenant
      */
-    private function sendActivationEmail($tenant) {
+    private function sendActivationEmail($tenant, $appName) {
 
         try {
 
@@ -81,14 +82,15 @@ class LaunchController extends Controller
             $message = $this->renderView(
                 'emails/basic.html.twig',
                 [
-                    'tenant' => $tenant,
+                    'tenant'  => $tenant,
+                    'app'     => $appName,
                     'message' => 'Account "'.$tenant->getName().'" activated'
                 ]
             );
             $client->sendEmail(
                 "system@annex-apps.com",
                 "system@annex-apps.com",
-                "Annex account activated",
+                "Annex account activated ({$appName})",
                 $message
             );
 
@@ -102,7 +104,7 @@ class LaunchController extends Controller
      * @param $tenant Tenant
      * Add the root user (to a new account)
      */
-    public function addAdminUser($tenant)
+    public function addAdminUser($tenant, $appName)
     {
         $manager = $this->get('fos_user.user_manager');
 
@@ -138,7 +140,7 @@ class LaunchController extends Controller
             $client->sendEmail(
                 "Annex Apps <system@annex-apps.com>",
                 'admin@annex-apps.com',
-                "Annex Apps account ".$tenant->getBrightpearlAccountCode()." has been deployed.",
+                "Annex Apps {$appName} account ".$tenant->getBrightpearlAccountCode()." has been deployed.",
                 $message
             );
         } catch (\Exception $generalException) {
@@ -155,7 +157,7 @@ class LaunchController extends Controller
      * Add the first staff member (using details from tenant table)
      * @param Tenant $tenant
      */
-    public function addUser(Tenant $tenant)
+    public function addUser(Tenant $tenant, $appName)
     {
 
         $pass  = $this->generatePassword();
@@ -169,6 +171,7 @@ class LaunchController extends Controller
         }
 
         $manager = $this->get('fos_user.user_manager');
+        $appName = ucfirst($appName);
 
         /** @var \AppBundle\Entity\Contact $user */
         $user = $manager->createUser();
@@ -198,7 +201,7 @@ class LaunchController extends Controller
             $client->sendEmail(
                 "Annex Apps <system@annex-apps.com>",
                 $email,
-                "Your Annex Apps account has been activated.",
+                "Your Annex Apps {$appName} account has been activated.",
                 $message
             );
         } catch (\Exception $generalException) {

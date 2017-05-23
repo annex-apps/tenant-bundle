@@ -92,6 +92,23 @@ class TenantService
     }
 
     /**
+     * @param $stub
+     * @return Tenant|null|object
+     * @throws \Exception
+     */
+    public function getTenantByStub($stub)
+    {
+        /** @var $repo \Annex\TenantBundle\Repository\TenantRepository */
+        $tenantRepo = $this->coreEntityManager->getRepository('AnnexTenantBundle:Tenant');
+
+        if ($this->tenant = $tenantRepo->findOneBy(['stub' => $stub])) {
+            return $this->tenant;
+        } else {
+            throw new \Exception("No tenant found with stub {$stub}");
+        }
+    }
+
+    /**
      * @param $customerId
      * @return Tenant|null|object
      * @throws \Exception

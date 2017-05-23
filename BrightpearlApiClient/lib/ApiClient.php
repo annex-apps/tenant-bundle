@@ -152,8 +152,6 @@ class ApiClient
             $url = ($url . '?' . http_build_query($queryParams) . '&' . $filterParams);
         }
 
-        $this->logger->debug($url);
-
         if ($method == self::$POST) {
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $postData);
@@ -182,7 +180,6 @@ class ApiClient
         // debugging for curl
         if ($this->config->getDebug()) {
             error_log("[DEBUG] HTTP Request body  ~BEGIN~\n".print_r($postData, true)."\n~END~\n", 3, $this->config->getDebugFile());
-
             curl_setopt($curl, CURLOPT_VERBOSE, 1);
             curl_setopt($curl, CURLOPT_STDERR, fopen($this->config->getDebugFile(), 'a'));
         } else {
@@ -202,6 +199,10 @@ class ApiClient
         // debug HTTP response body
         if ($this->config->getDebug()) {
             error_log("[DEBUG] HTTP Response body ~BEGIN~\n".print_r($http_body, true)."\n~END~\n", 3, $this->config->getDebugFile());
+        }
+
+        if ($response_info['http_code']) {
+            $this->logger->debug($url." Response:".$response_info['http_code']);
         }
 
         // Handle the response

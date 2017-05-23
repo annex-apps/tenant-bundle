@@ -157,6 +157,7 @@ class CustomConnectionFactory extends ConnectionFactory
                 brightpearl_token
               FROM {$this->database}.tenant
               WHERE stub = '{$account_code}'
+              OR brightpearl_account_code = '{$account_code}'
               LIMIT 1
               ") ){
                 return $stmt->fetchAll(\PDO::FETCH_ASSOC);
