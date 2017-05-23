@@ -89,13 +89,14 @@ class SubscriptionController extends Controller
         /** @var \Annex\TenantBundle\Services\StripeHandler $stripeService */
         $stripeService = $this->get('service.stripe');
 
-        if ($stripeService->cancelSubscription( $tenant->getSubscription()->getStripeId() )) {
-            $this->addFlash('success', "Your subscription was cancelled");
-            $tenantService->cancelSubscription( $tenant->getSubscription()->getId() );
-        } else {
+        if (!$stripeService->cancelSubscription( $tenant->getSubscription()->getStripeId() )) {
             foreach ($stripeService->errors AS $error) {
                 $this->addFlash('error', $error);
             }
+        }
+
+        if ($tenantService->cancelSubscription( $tenant->getSubscription()->getId() )) {
+            $this->addFlash('success', "Your subscription was cancelled");
         }
 
         return $this->redirectToRoute('account_billing');
