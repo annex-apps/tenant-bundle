@@ -6,7 +6,7 @@
 
 {% block content %}
 
-    {% if tenant.subscription %}
+    {% if tenant.subscription and tenant.subscription.status == 'active' %}
 
         <div class="row">
             <div class="col-md-12">
@@ -83,8 +83,6 @@
 
             </div>
         </div>
-    {% else %}
-
     {% endif %}
 
     <div class="row" id="plans">
@@ -110,10 +108,10 @@
                             {{ plan.description|raw }}
                         </div>
                         <br>
-                        {% if tenant.subscription and tenant.subscription.plan.id == plan.id %}
+                        {% if tenant.subscription and tenant.subscription.plan.id == plan.id and tenant.subscription.status == 'active' %}
                             <strong>This is your plan</strong>
                         {% else %}
-                            {% if tenant.subscription %}
+                            {% if tenant.subscription and tenant.subscription.status == 'active' %}
                                 <a href="{{ path('change_plan', {to: plan.code}) }}" class="">Change to this plan</a>
                             {% else %}
                                 <a href="#" class="btn btn-success plan-subscribe" data-name="{{ plan.name }}" id="{{ plan.code }}">Subscribe</a>
