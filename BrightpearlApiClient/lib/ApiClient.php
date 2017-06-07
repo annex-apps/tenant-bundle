@@ -333,9 +333,13 @@ class ApiClient
         $response = curl_exec($curl);
         $response_info = curl_getinfo($curl);
         if ($response_info['http_code'] == 503) {
-            $this->logger->addInfo("Waiting half a second ({$ruid} {$attempt}) ...");
-            usleep(500);
+            $this->logger->addInfo("Waiting a second ({$ruid} {$attempt}) ...");
+            sleep(1);
             $attempt++;
+            if ($attempt == 10) {
+                $this->logger->addInfo("Aborting ({$ruid} {$attempt}) ...");
+                return false;
+            }
             return $this->makeRequest($curl, $attempt, $ruid);
         } else {
             return $response;
