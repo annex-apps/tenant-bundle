@@ -319,15 +319,24 @@ class ApiClient
     /**
      * Deal with 503 throttling
      * @param $curl
+     * @param $attempt
+     * @param $ruid
      * @return mixed
      */
-    private function makeRequest($curl)
+    private function makeRequest($curl, $attempt = 1, $ruid = null)
     {
+        // Allows us to track number of attempts for a given call
+        if ($ruid == null) {
+            $ruid = 'RUID-'.rand(1,1000);
+        }
+
         $response = curl_exec($curl);
         $response_info = curl_getinfo($curl);
         if ($response_info['http_code'] == 503) {
+            $this->logger->addInfo("Waiting half a second ({$ruid} {$attempt}) ...");
             usleep(500);
-            return $this->makeRequest($curl);
+            $attempt++;
+            return $this->makeRequest($curl, $attempt, $ruid);
         } else {
             return $response;
         }
