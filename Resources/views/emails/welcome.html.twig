@@ -10,19 +10,23 @@
     We've created an account for you on our <strong>{{ app_name|capitalize }}</strong> app;
     <br>
     <br>
-    <table cellpadding="10" cellspacing="0">
-        <tr>
-            <td>Login URL:</td>
-            <td><a href="https://www.{{ app_tld }}/login?accountCode={{ tenant.stub }}">https://www.{{ app_tld }}/login?accountCode={{ tenant.stub }}</a></td>
-        </tr>
-        <tr>
-            <td>Email address:</td>
-            <td>{{ email }}</td>
-        </tr>
-        <tr>
-            <td>Password:</td>
-            <td>{{ password }}</td>
-        </tr>
-    </table>
+    <div>
+        Log in at:<br>
+        <a href="https://www.{{ app_tld }}/login?accountCode={{ tenant.stub }}">https://www.{{ app_tld }}/login?accountCode={{ tenant.stub }}</a>
+    </div>
+
+    <br>
+
+    <div>
+        Email address:<br>
+        {{ email }}
+    </div>
+
+    <br>
+
+    <div>
+        Password:<br>
+        {{ password }}
+    </div>
 
 {% endblock %}

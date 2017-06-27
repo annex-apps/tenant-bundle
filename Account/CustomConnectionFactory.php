@@ -199,17 +199,17 @@ class CustomConnectionFactory extends ConnectionFactory
             return $this->request->getCurrentRequest()->get('accountCode');
         }
 
+        // Most requests when a user has already identified their account code
+        if ($this->session->get('tenantCode')) {
+            return $this->session->get('tenantCode');
+        }
+
         // When receiving callbacks from Stripe or other services to the main domain handler
         if (isset($_SERVER['HTTP_HOST'])
             && $_SERVER['HTTP_HOST'] == $this->appUrl
             && $_SERVER['HTTP_HOST'] != 'localhost:8000') {
             // return false directs the connection to continue to core DB rather than tenant DB
             return false;
-        }
-
-        // Most requests when a user has already identified their account code
-        if ($this->session->get('tenantCode')) {
-            return $this->session->get('tenantCode');
         }
 
         // LEGACY
