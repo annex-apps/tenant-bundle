@@ -107,7 +107,7 @@ class CustomConnectionFactory extends ConnectionFactory
             } else if (isset($_SERVER['HTTP_HOST']) ) {
 
                 // We're in production and can't find the account, redirect to signup page where we don't need an account
-                header("Location: http://www.".$this->appSignupUrl."/signup?accountNotFound=".$account_code);
+                header("Location: https://www.".$this->appSignupUrl."/signup?accountNotFound=".$account_code);
                 die();
 
             } else {
@@ -185,7 +185,7 @@ class CustomConnectionFactory extends ConnectionFactory
             return $_GET['accountCode'];
         }
 
-        if ($_GET['accountNotFound']) {
+        if (isset($_GET['accountNotFound'])) {
             return false;
         }
 

@@ -45,7 +45,7 @@ class LaunchController extends Controller
 
         // Already activated
         if ($tenant->getStatus() != 'PENDING') {
-            return $this->redirect("http://{$tenant->getBrightpearlAccountCode()}.{$appDomain}/login");
+            return $this->redirect("https://www.{$appDomain}/login?accountCode={$tenant->getBrightpearlAccountCode()}");
         }
 
         // Save the token into the tenant database
@@ -61,9 +61,9 @@ class LaunchController extends Controller
             $this->sendActivationEmail($tenant, $appName);
 
             if ($this->getParameter("kernel.environment") == 'prod') {
-                return $this->redirect("http://{$tenant->getBrightpearlAccountCode()}.{$appDomain}/login?launched=1");
+                return $this->redirect("https://www.{$appDomain}/login?accountCode={$tenant->getBrightpearlAccountCode()}&launched=1");
             } else {
-                return $this->redirect("http://{$tenant->getBrightpearlAccountCode()}.localhost:8000/login?launched=1");
+                return $this->redirect("https://www.localhost:8000/login?accountCode={$tenant->getBrightpearlAccountCode()}&launched=1");
             }
         } else {
             die("Could not update tenant with token");
