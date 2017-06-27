@@ -129,7 +129,7 @@ class TenantService
         if ($this->tenant = $tenantRepo->findOneBy(['stub' => $stub])) {
             return $this->tenant;
         } else {
-            throw new \Exception("No tenant found with stub {$stub}");
+            return false;
         }
     }
 
