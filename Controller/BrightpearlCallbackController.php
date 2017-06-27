@@ -17,9 +17,9 @@ class BrightpearlCallbackController extends Controller
     public function setupAction(Request $request)
     {
         $accountCode = $request->get("accountCode");
-        $appDomain = $this->getParameter('app_info.tld');
+        $appDomain = $this->getParameter('app_info.domain');
         // Redirects user to login if not authenticated
-        return $this->redirect("http://{$accountCode}.{$appDomain}");
+        return $this->redirect("https://{$appDomain}/?accountCode={$accountCode}");
     }
 
     /**
@@ -29,7 +29,7 @@ class BrightpearlCallbackController extends Controller
     {
 
         // We install by querying Brightpearl post sign-up, so we don't need to use this call from BP
-        $app = $request->get('app');
+        $app = $this->getParameter('app_info.name');
         $accountCode = $request->get('accountCode');
 
         try {
@@ -61,7 +61,7 @@ class BrightpearlCallbackController extends Controller
     {
 
         // We install by querying Brightpearl post sign-up, so we don't need to use this call from BP
-        $app = $request->get('app');
+        $app = $this->getParameter('app_info.name');
         $accountCode = $request->get('accountCode');
 
         try {
