@@ -185,6 +185,10 @@ class CustomConnectionFactory extends ConnectionFactory
             return $_GET['accountCode'];
         }
 
+        if ($_GET['accountNotFound']) {
+            return false;
+        }
+
         if ($this->request->getCurrentRequest() && $this->request->getCurrentRequest()->get('signup-test')) {
             // Signup form submit which must be to no tenant domain
             return false;
