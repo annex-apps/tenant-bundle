@@ -33,6 +33,9 @@ class CustomConnectionFactory extends ConnectionFactory
     /** @var string */
     private $testAccount;
 
+    /** @var Session */
+    private $session;
+
     /**
      * @param Session $session
      * @param RequestStack $request
@@ -99,6 +102,7 @@ class CustomConnectionFactory extends ConnectionFactory
                 $this->accountId    = $result[0]['id'];
 
                 $this->session->set('tenantId', $this->accountId);
+                $this->session->set('tenantCode', $account_code);
 
             } else if (isset($_SERVER['HTTP_HOST']) ) {
 
@@ -187,7 +191,7 @@ class CustomConnectionFactory extends ConnectionFactory
         }
 
         if ($this->request->getCurrentRequest() && $this->request->getCurrentRequest()->get('accountCode')) {
-            // Launch via functional tests
+            // Launch a new account via functional tests (where no subdomain)
             return $this->request->getCurrentRequest()->get('accountCode');
         }
 
@@ -199,6 +203,12 @@ class CustomConnectionFactory extends ConnectionFactory
             return false;
         }
 
+        // Most requests when a user has already identified their account code
+        if ($this->session->get('tenantCode')) {
+            return $this->session->get('tenantCode');
+        }
+
+        // LEGACY
         // Get account from subdomain (will not return anything when called from command line)
         if (isset($_SERVER['HTTP_HOST'])) {
             $d = explode(".",$_SERVER['HTTP_HOST']);

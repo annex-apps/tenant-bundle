@@ -12,6 +12,7 @@ use Annex\TenantBundle\Entity\Plan;
 use Annex\TenantBundle\Entity\Subscription;
 use Annex\TenantBundle\Entity\Tenant;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class TenantService
 {
@@ -27,12 +28,20 @@ class TenantService
     /** @var Tenant */
     public $tenant;
 
-    public function __construct(EntityManager $em, $coreDbName)
+    /** @var Session */
+    private $session;
+
+    public function __construct(EntityManager $em, $coreDbName, Session $session)
     {
         $this->em = $em;
         $this->coreDbName = $coreDbName;
+        $this->session = $session;
 
         $this->getEntityManager($coreDbName);
+
+        if ($id = $this->session->get('tenantId')) {
+            $this->tenant = $this->getTenant($id);
+        }
     }
 
     /**
@@ -40,8 +49,13 @@ class TenantService
      * @return Tenant|null|object
      * @throws \Exception
      */
-    public function getTenant($tenantId)
+    public function getTenant($tenantId = null)
     {
+        // Already logged in
+        if ($this->tenant) {
+            return $this->tenant;
+        }
+
         if (!$tenantId) {
             throw new \Exception("No tenant ID given for getTenant");
         }
@@ -54,6 +68,17 @@ class TenantService
         } else {
             throw new \Exception("No tenant found for {$tenantId}");
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccountCode()
+    {
+        if (!$this->tenant) {
+            return null;
+        }
+        return $this->tenant->getBrightpearlAccountCode();
     }
 
     /**
