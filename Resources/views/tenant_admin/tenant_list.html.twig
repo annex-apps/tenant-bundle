@@ -30,7 +30,8 @@
                                 <br>Expires: {{ tenant.trialExpiresAt|date("d M Y") }}
                             {% endif %}
                             {% if tenant.subscription %}
-                                <br>Plan: {{ tenant.subscription.plan.name }}
+                                <br><a href="https://dashboard.stripe.com/subscriptions/{{ tenant.subscription.stripeId }}" target="_blank">{{ tenant.subscription.plan.name }}</a>
+                                <br>{{ tenant.subscription.currency|upper }} {{ tenant.subscription.amount|number_format(2) }}
                             {% endif %}
                         </td>
                         <td>{{ tenant.createdAt|date("d M Y H:i") }}</td>
