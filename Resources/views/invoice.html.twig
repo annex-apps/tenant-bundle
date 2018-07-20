@@ -9,12 +9,14 @@
 
     <title>Invoice</title>
 
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <style>
-    #invoice-container {
-        padding: 40px;
+    body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+    table {
+        width: 100%;
     }
     .invoice-total {
         font-size: 14px;
@@ -22,88 +24,79 @@
         padding-bottom: 4px;
     }
 </style>
-<div class="container" id="invoice-container">
+<div class="container" style="padding: 40px">
 
-    <div class="row">
-        <div class="col-md-6" style="padding-left: 25px">
-            <h2>Annex Apps Invoice {{ invoiceReference }}</h2>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-4" style="padding-left: 25px">
-            <strong>Tax date</strong><br>
-            {{ invoice.date|date("d M Y") }}
-        </div>
-        <div class="col-md-4">
-            <div class="pull-right">
+    <table>
+        <tr>
+            <td>
+                <h2>Annex Apps Invoice {{ invoiceReference }}</h2>
+            </td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
+            <td>
+                <strong>Tax date</strong><br>
+                {{ invoice.date|date("d M Y") }}
+            </td>
+            <td style="text-align: right">
                 <strong>Invoice to:</strong><br>
                 {{ tenant.name }}<br>
                 {{ tenant.ownerName }}<br>
                 {{ tenant.ownerEmail }}
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th></th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for line in invoice.lines.data %}
-                    <tr>
-                        <td>
-                            {{ app_name }} : {{ line.plan.name }} plan<br>
-                            {{ line.period.start|date("d M Y") }} to {{ line.period.end|date("d M Y") }}<br>
-                            {{ line.description }}
-                        </td>
-                        <td style="text-align:right">
-                            {{ line.currency|upper }} {{ (line.amount/100)|number_format(2, '.', ',') }}
-                        </td>
-                    </tr>
-                {% endfor %}
-                <tr>
-                    <td colspan="2">
-                        <span class="pull-right invoice-total">
-                            Subtotal {{ invoice.currency|upper }} {{ (invoice.subtotal/100)|number_format(2, '.', ',') }}
-                        </span>
-                        <div style="clear: both"></div>
-                        <span class="pull-right invoice-total">
-                            Tax {{ invoice.currency|upper }} {{ (invoice.tax/100)|number_format(2, '.', ',') }}
-                        </span>
-                        <div style="clear: both"></div>
-                        <span class="pull-right invoice-total">
-                            Total {{ invoice.currency|upper }} {{ (invoice.total/100)|number_format(2, '.', ',') }}
-                        </span>
-                        <div style="clear: both"></div>
-                        <span class="pull-right">
-                            {% if invoice.paid %}
-                                <span class="label label-success">Paid</span>
-                            {% else %}
-                                <span class="label label-danger">Not paid</span>
-                            {% endif %}
-                        </span>
+            </td>
+        </tr>
+    </table>
 
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+    <table>
+        <thead>
+        <tr>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for line in invoice.lines.data %}
+            <tr>
+                <td>
+                    {{ app_name }} : {{ line.plan.name }} plan<br>
+                    {{ line.period.start|date("d M Y") }} to {{ line.period.end|date("d M Y") }}<br>
+                    {{ line.description }}
+                </td>
+                <td style="text-align:right">
+                    {{ line.currency|upper }} {{ (line.amount/100)|number_format(2, '.', ',') }}
+                </td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td></td>
+            <td style="text-align: right" class="invoice-total">
+                    Subtotal {{ invoice.currency|upper }} {{ (invoice.subtotal/100)|number_format(2, '.', ',') }}<br>
+                    Tax {{ invoice.currency|upper }} {{ (invoice.tax/100)|number_format(2, '.', ',') }}<br>
+                    Total {{ invoice.currency|upper }} {{ (invoice.total/100)|number_format(2, '.', ',') }}<br>
 
-        </div>
+                <br><br>
+                Amount paid: {{ (invoice.amount_paid/100)|number_format(2, '.', ',') }}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+
+    Annex Apps<br>
+    Heol Las Fawr<br>
+    Ferwig<br>
+    SA43 1QA<br>
+    United Kingdom
+
+    <br><br>
+    <div style="font-size:11px">
+        Stripe ID: <a href="{{ invoice.invoice_pdf }}">{{ invoice.id }}</a>
     </div>
 
-    <div class="row">
-        <div class="col-md-12" style="padding-left: 25px">
-            Annex Apps<br>
-            Heol Las Fawr<br>
-            Ferwig<br>
-            SA43 1QA<br>
-            United Kingdom
-        </div>
-    </div>
+
+
 </div>
 </body>
 </html>

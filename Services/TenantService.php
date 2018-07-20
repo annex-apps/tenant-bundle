@@ -198,7 +198,7 @@ class TenantService
         $this->coreEntityManager->persist($invoice);
         try {
             $this->coreEntityManager->flush();
-            return true;
+            return $invoice->getId();
         } catch (\Exception $e) {
             throw new \Exception("Could not save invoice: ".$e->getMessage());
         }

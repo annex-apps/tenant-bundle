@@ -1,0 +1,16 @@
+{# app/Resources/views/emails/invoice.html.twig #}
+{% extends 'AnnexTenantBundle::emails/template.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block heading %}{{ heading }}{% endblock %}
+
+{% block content %}
+    A new invoice for your {{ appName }} app is available.
+    <br><br>
+    <a href="{{ link }}">Click here to view it online</a>
+    <br><br>
+    We'll attempt to take payment shortly using the credit card we have on file.
+    <br><br>
+    To view previous invoices or update your billing details, log in at <a href="https://{{ app_domain }}">https://{{ app_domain }}</a>
+{% endblock %}
