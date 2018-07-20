@@ -84,9 +84,10 @@ class StripeWebhookController extends Controller
                     $status = 'Failed to find tenant for invoice using '.$event->customer;
                 }
                 break;
-            case "invoice.payment_failed":
+            case "charge.failed":
+                $message = $event->outcome->seller_message;
                 if ($tenant = $tenantService->getTenantByStripeCustomerId($event->customer)) {
-                    $this->sendFailureEmail($tenant);
+                    $this->sendFailureEmail($tenant, $message);
                 } else {
                     $status = 'Failed to find tenant for email using '.$event->customer;
                 }
@@ -202,13 +203,16 @@ class StripeWebhookController extends Controller
     /**
      * @param Tenant $tenant
      */
-    private function sendFailureEmail(Tenant $tenant)
+    private function sendFailureEmail(Tenant $tenant, $message)
     {
         $appName = ucfirst($this->getParameter('app_info.name'));
         $appUrl  = $this->getParameter('app_info.domain');
 
         $messageBody = <<<EOB
-We've just tried to charge your credit card for your Annex Apps {$appName} account, but it was rejected by the bank.
+We've just tried to charge your credit card for your Annex Apps {$appName} account, but it failed:
+<br><br>
+<strong>{$message}</strong>
+<br><br>
 We'll try again in a couple of days. If you'd like to change the card we have on record, please log in to https://{$appUrl}.
 <br><br>
 After three failures, your subscription will be cancelled.
