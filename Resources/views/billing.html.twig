@@ -77,7 +77,7 @@
                             <td>{{ invoice.taxDate|date("d M Y") }}</td>
                             <td class="text-right">{{ invoice.currency|upper }} {{ (invoice.amount/100)|number_format(2, '.', ',') }}</td>
                             {#<td class="text-right"><a target="_blank" href="{{ path('invoice_print', {id: invoice.id}) }}">Print</a></td>#}
-                            <td class="text-right"><a target="_blank" href="{{ invoice.invoice_pdf }}">Print</a></td>
+                            <td class="text-right"><a target="_blank" href="{{ path('invoice_print', {id: invoice.id}) }}">Print</a></td>
                         </tr>
                     {% endfor %}
                 </table>
