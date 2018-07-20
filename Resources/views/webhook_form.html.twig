@@ -6,11 +6,14 @@
     <form method="POST" action="/stripe/webhook">
         <select name="event-type" >
             <option value="invoice.created">invoice.created</option>
+            <option value="invoice.payment_failed">invoice.payment_failed</option>
+            <option value="customer.subscription.deleted">customer.subscription.deleted</option>
+            <option value="customer.subscription.created">customer.subscription.created</option>
         </select>
         <br>
         <label>
             <input type="checkbox" name="send-invoice">
-            Send invoice by email
+            Send email
         </label>
         <textarea name="webhook-data" rows="20" style="width:100%;"></textarea>
         <input type="submit" class="btn btn-default">
