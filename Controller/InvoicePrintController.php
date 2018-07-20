@@ -37,12 +37,17 @@ class InvoicePrintController extends Controller
         /** @var $invoice \Annex\TenantBundle\Entity\Invoice */
         $stripeInvoiceId = $invoice->getStripeId();
 
-        if ($invoice = $stripeService->getInvoice($stripeInvoiceId)) {
-            return $this->render('AnnexTenantBundle::invoice.html.twig', [
-                'invoiceReference' => $id,
-                'tenant' => $tenant,
-                'invoice'  => $invoice,
-            ]);
+        /** @var \Stripe\Invoice $stripeInvoice */
+        if ($stripeInvoice = $stripeService->getInvoice($stripeInvoiceId)) {
+
+            // Send user to the Stripe version of this invoice
+            return $this->redirect($stripeInvoice->invoice_pdf);
+
+//            return $this->render('AnnexTenantBundle::invoice.html.twig', [
+//                'invoiceReference' => $id,
+//                'tenant' => $tenant,
+//                'invoice'  => $invoice,
+//            ]);
         } else {
             $this->addFlash('error', "Could not find an invoice with ID {$stripeInvoiceId}");
             return $this->redirectToRoute('account_billing');
