@@ -35,6 +35,8 @@ class StripeWebhookController extends Controller
             $sendInvoice = true;
         }
 
+        $tenantName = 'none';
+
         $status = 'Received OK';
         switch ($event_type) {
             case "customer.subscription.deleted":
@@ -45,13 +47,16 @@ class StripeWebhookController extends Controller
                             $this->sendCancelEmail($tenant);
                         }
                     }
+                    $tenantName = $tenant->getBrightpearlAccountCode();
                 } else {
                     $status = 'Failed to find tenant using '.$event->customer;
                 }
                 break;
             case "customer.subscription.created":
                 /** @var \Annex\TenantBundle\Entity\Tenant $tenant */
-                if (!$tenant = $tenantService->getTenantByStripeCustomerId($event->customer)) {
+                if ($tenant = $tenantService->getTenantByStripeCustomerId($event->customer)) {
+                    $tenantName = $tenant->getBrightpearlAccountCode();
+                } else {
                     $status = 'Failed to find tenant for new subscription using '.$event->customer;
                 }
                 break;
@@ -80,6 +85,8 @@ class StripeWebhookController extends Controller
                         $status = 'Failed to add invoice';
                     }
 
+                    $tenantName = $tenant->getBrightpearlAccountCode();
+
                 } else {
                     $status = 'Failed to find tenant for invoice using '.$event->customer;
                 }
@@ -88,6 +95,7 @@ class StripeWebhookController extends Controller
                 $message = $event->outcome->seller_message;
                 if ($tenant = $tenantService->getTenantByStripeCustomerId($event->customer)) {
                     $this->sendFailureEmail($tenant, $message);
+                    $tenantName = $tenant->getBrightpearlAccountCode();
                 } else {
                     $status = 'Failed to find tenant for email using '.$event->customer;
                 }
@@ -100,7 +108,8 @@ class StripeWebhookController extends Controller
             'event'  => $event->object
         ];
 
-        $subject = "Webhook: ".$event_type;
+
+        $subject = "Webhook {$tenantName}: ".$event_type;
         $this->sendWebhookNotification($subject, print_r($responseJson, true).'<hr>'.print_r($input, true) );
 
         // Thank you Stripe
