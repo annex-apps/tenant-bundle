@@ -136,7 +136,7 @@ class StripeWebhookController extends Controller
                 $message = $this->renderView(
                     'AnnexTenantBundle::emails/invoice_attached.html.twig',
                     [
-                        'title' => "",
+                        'title' => "Your Annex Apps Invoice",
                         'heading' => "Your Annex Apps Invoice",
                         'appName' => $appName,
                         'link' => $invoice->invoice_pdf
