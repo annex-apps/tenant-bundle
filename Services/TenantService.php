@@ -12,7 +12,7 @@ use Annex\TenantBundle\Entity\Plan;
 use Annex\TenantBundle\Entity\Subscription;
 use Annex\TenantBundle\Entity\Tenant;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class TenantService
 {
@@ -28,10 +28,10 @@ class TenantService
     /** @var Tenant */
     public $tenant;
 
-    /** @var Session */
+    /** @var SessionInterface */
     private $session;
 
-    public function __construct(EntityManager $em, $coreDbName, Session $session)
+    public function __construct(EntityManager $em, $coreDbName, SessionInterface $session)
     {
         $this->em = $em;
         $this->coreDbName = $coreDbName;

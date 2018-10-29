@@ -1,0 +1,1 @@
+This folder duplicates a lot of code in the higher BrightpearlApiClient BUT is namespaced to work straight up with Symfony 4.
