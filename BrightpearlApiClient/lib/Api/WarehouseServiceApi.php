@@ -2903,7 +2903,7 @@ class WarehouseServiceApi
         }
   
         // parse inputs
-        $resourcePath = "/{ACCOUNT-CODE}/warehouse-service/shipping-method{/ID-SET}";
+        $resourcePath = "/{ACCOUNT-CODE}/warehouse-service/shipping-method/{/ID-SET}";
         $httpBody = '';
         $queryParams = array();
         $headerParams = array();
