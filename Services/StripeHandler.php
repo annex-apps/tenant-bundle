@@ -2,6 +2,7 @@
 
 namespace Annex\TenantBundle\Services;
 
+use Annex\TenantBundle\Entity\Tenant;
 use Stripe\Stripe;
 
 class StripeHandler
@@ -34,10 +35,6 @@ class StripeHandler
         if ($this->apiKey) {
             $this->setApiKey($this->apiKey);
         }
-
-//        $curl = new \Stripe\HttpClient\CurlClient(array(CURLOPT_SSLVERSION => 6));
-//        \Stripe\ApiRequestor::setHttpClient($curl);
-//        Stripe::$apiBase = "https://api-tls12.stripe.com";
     }
 
     /**
@@ -122,24 +119,62 @@ class StripeHandler
     }
 
     /**
-     * @param string $stripeCustomerId
-     * @param string $token
-     * @param string $planCode
+     * @param Tenant $tenant
+     * @param $tokenId
+     * @param $planCode
      * @return bool|\Stripe\Subscription
      */
-    public function createSubscription($stripeCustomerId, $token, $planCode)
+    public function createSubscription(Tenant $tenant, $tokenId, $planCode)
     {
+        if ($stripeCustomerId = $tenant->getStripeCustomerId()) {
+            // Update the customer to use the new card details
+            try {
+                \Stripe\Customer::update(
+                    $stripeCustomerId,
+                    ['source' => $tokenId,]
+                );
+            } catch (\Exception $generalException) {
+                $this->errors[] = $generalException->getMessage();
+                return false;
+            }
+        } else {
+            // new customer
+            $customerDetails = [
+                'name' => $tenant->getName(),
+                'description' => $tenant->getOwnerName(),
+                'email' => $tenant->getOwnerEmail(),
+                'source' => $tokenId
+            ];
+
+            if (!$customer = $this->createCustomer($customerDetails)) {
+                $this->errors[] = "Could not create a customer in Stripe";
+                return false;
+            }
+
+            $stripeCustomerId = $customer['id'];
+        }
+
         try {
             $response = \Stripe\Subscription::create([
                 'customer' => $stripeCustomerId,
                 'plan'     => $planCode,
-                'source'   => $token
+                'expand'   => ['latest_invoice.payment_intent']
             ]);
+
             if (isset($response->error)) {
                 $this->errors[] = $response->error->type.' : '.$response->error->message;
                 return false;
             }
-            return $response;
+
+            if ($response->status == 'active') {
+                return $response;
+            } else if ($response->status == 'incomplete') {
+                return $response;
+            } else {
+                $this->errors[] = 'Unhandled response status: '.$response->status;
+                return false;
+            }
+
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
             return false;

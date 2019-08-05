@@ -1,0 +1,16 @@
+{% extends 'AnnexTenantBundle::emails/template.html.twig' %}
+
+{% block title %}Welcome!{% endblock %}
+
+{% block heading %}Thanks for subscribing to Annex Apps {{ app_name|capitalize }}{% endblock %}
+
+{% block content %}
+    <p>
+        You're now subscribed to the {{ tenant.subscription.plan.name }} plan.
+    </p>
+    <br><br>
+    <p>
+        Account : {{ tenant.name }}<br>
+        Email address : {{ tenant.ownerEmail }}
+    </p>
+{% endblock %}

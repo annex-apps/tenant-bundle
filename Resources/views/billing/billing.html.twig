@@ -29,7 +29,7 @@
                             </span>
                     {% endfor %}
                     <span class="add-card" style="float: left; width: 300px; text-align: center; padding: 10px;">
-                            <a href="#" id="add-card"><i class="fa fa-plus-circle" style="font-size: 26px;"></i><br>Add a new card</a>
+                            <a href="{{ path('card_form') }}"><i class="fa fa-plus-circle" style="font-size: 26px;"></i><br>Add a new card</a>
                             <br>This will replace your existing card
                         </span>
                 </div>
@@ -38,14 +38,9 @@
                     We don't have any cards on record for you.
                     You still have an active subscription, which will be cancelled at the end of the current billing
                     period if we can't charge a card. <br><br>
-                    <a href="#" id="add-card" class="btn btn-success">Add a new card</a>
+                    <a href="{{ path('card_form') }}" class="btn btn-success">Add a new card</a>
                 </div>
             {% endif %}
-
-            <form id="add-card-form" action="{{ path('card_add') }}" method="POST">
-                <input type="hidden" name="stripeToken" id="stripeToken">
-                <input type="hidden" name="stripeEmail" id="stripeEmail" value="{{ tenant.ownerEmail }}">
-            </form>
 
             </div>
         </div>
@@ -91,12 +86,6 @@
             <h4>Available plans</h4>
             <br>
 
-            <form id="plan-form" action="{{ path('subscription_add') }}" method="POST">
-                <input type="hidden" name="planCode" id="planCode">
-                <input type="hidden" name="stripeToken" id="stripeToken">
-                <input type="hidden" name="stripeEmail" id="stripeEmail" value="{{ tenant.ownerEmail }}">
-            </form>
-
             {% for plan in plans %}
                 <div class="col-md-4">
                     <div class="plan-wrapper">
@@ -113,9 +102,9 @@
                             <strong>This is your plan</strong>
                         {% else %}
                             {% if tenant.subscription and tenant.subscription.status == 'active' %}
-                                <a href="{{ path('change_plan', {to: plan.code}) }}" class="">Change to this plan</a>
+                                <a href="{{ path('card_form', {planCode: plan.code}) }}" class="">Change to this plan</a>
                             {% else %}
-                                <a href="#" class="btn btn-success plan-subscribe" data-name="{{ plan.name }}" id="{{ plan.code }}">Subscribe</a>
+                                <a href="{{ path('card_form', {planCode: plan.code}) }}" class="btn btn-success plan-subscribe" data-name="{{ plan.name }}" id="{{ plan.code }}">Subscribe</a>
                             {% endif %}
                         {% endif %}
                     </div>
@@ -144,69 +133,12 @@
         </div>
     </div>
 
-
 {% endblock %}
 
 {% block stylesheets %}{% endblock %}
 
 {% block javascripts %}
-    <script src="https://checkout.stripe.com/checkout.js"></script>
     <script>
-        var subscribeHandler = StripeCheckout.configure({
-            key: '{{ stripe_public_key }}',
-            locale: 'auto',
-            token: function (token) {
-                $("#stripeToken").val(token.id);
-                $(".plan-subscribe").attr('disabled', true);
-                $("#plan-form").submit();
-            }
-        });
-
-        $(document).delegate(".plan-subscribe", 'click', function (e) {
-            $("#planCode").val( $(this).attr("id") );
-            var buttonLabel = "Start subscription";
-            // Open Checkout with further options:
-            subscribeHandler.open({
-                name: 'Annex Apps',
-                description: $(this).data("name")+" subscription",
-                zipCode: false,
-                currency: 'gbp',
-                amount: 0,
-                email: '{{ tenant.ownerEmail }}',
-                panelLabel: buttonLabel,
-                allowRememberMe: false
-            });
-            e.preventDefault();
-        });
-
-        var newCardHandler = StripeCheckout.configure({
-            key: '{{ stripe_public_key }}',
-            locale: 'auto',
-            token: function (token) {
-                $("#stripeToken").val(token.id);
-                $("#add-card-form").submit();
-            }
-        });
-
-        $(document).delegate("#add-card", 'click', function (e) {
-            newCardHandler.open({
-                name: 'Annex Apps',
-                description: "Add a new card",
-                zipCode: false,
-                currency: 'gbp',
-                amount: 0,
-                email: '{{ tenant.ownerEmail }}',
-                panelLabel: "Add card",
-                allowRememberMe: false
-            });
-            e.preventDefault();
-        });
-
-        // Close Checkout on page navigation:
-        window.addEventListener('popstate', function () {
-            handler.close();
-        });
-
         $(document).delegate("#subscription-cancel", 'click', function (e) {
             if (window.confirm("Are you sure? This is not reversible and no refunds will be made.")) {
                 return true;

@@ -1,0 +1,16 @@
+{% extends 'AnnexTenantBundle::emails/template.html.twig' %}
+
+{% block title %}Thank you{% endblock %}
+
+{% block heading %}You've added a new card.{% endblock %}
+
+{% block content %}
+    <p>
+        Your {{ tenant.subscription.plan.name }} plan will be charged to your new card.
+    </p>
+    <br><br>
+    <p>
+        Account : {{ tenant.name }}<br>
+        Email address : {{ tenant.ownerEmail }}
+    </p>
+{% endblock %}

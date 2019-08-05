@@ -152,20 +152,20 @@ class TenantService
     }
 
     /**
-     * @param $subscriptionData
+     * @param $id
      * @param Plan $plan
      * @return bool
      * @throws \Exception
      */
-    public function addSubscription($subscriptionData, Plan $plan)
+    public function addSubscription($id, Plan $plan)
     {
         // Create the subscription locally
         $subscription = new Subscription();
         $subscription->setTenant($this->tenant);
-        $subscription->setAmount($subscriptionData['plan']['amount']);
-        $subscription->setCurrency($subscriptionData['plan']['currency']);
+        $subscription->setAmount($plan->getAmount());
+        $subscription->setCurrency($plan->getCurrency());
         $subscription->setStatus(Subscription::STATUS_ACTIVE);
-        $subscription->setStripeId($subscriptionData['id']);
+        $subscription->setStripeId($id);
         $subscription->setPlan($plan);
 
         // Save a new subscription
