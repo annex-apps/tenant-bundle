@@ -52,7 +52,10 @@ class DefaultController extends Controller
             }
         }
 
-        $plans = $tenantService->getPlans(['currency' => $currencyCode]);
+        $plans = $tenantService->getPlans([
+            'currency' => $currencyCode,
+            'isActive' => true
+        ]);
 
         return $this->render('AnnexTenantBundle::plans.html.twig', [
             'plans' => $plans,
