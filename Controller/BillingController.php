@@ -27,7 +27,10 @@ class BillingController extends Controller
         } else {
             $currencyCode = 'usd';
         }
-        $plans = $tenantService->getPlans(['currency' => $currencyCode]);
+        $plans = $tenantService->getPlans([
+            'currency' => $currencyCode,
+            'isActive' => 1
+        ]);
 
         /** @var \Annex\TenantBundle\Services\StripeHandler $stripeService */
         $stripeService = $this->get('service.stripe');
