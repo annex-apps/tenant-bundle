@@ -63,15 +63,15 @@ class StripeWebhookController extends Controller
             case "invoice.created":
                 if ($tenant = $tenantService->getTenantByStripeCustomerId($event->customer)) {
 
-                    $date = \DateTime::createFromFormat("U", $event->date);
+                    $date = \DateTime::createFromFormat("U", $event->created);
 
                     /** @var \Stripe\Invoice $event */
                     $invoice = new Invoice();
                     $invoice->setCurrency($event->currency);
                     $invoice->setTenant($tenant);
                     $invoice->setStripeId($event->id);
-                    $invoice->setAmount($event->total);
-                    $invoice->setIsPaid($event->paid);
+                    $invoice->setAmount($event->amount_due);
+                    $invoice->setIsPaid($event->amount_paid);
                     $invoice->setTaxDate($date);
 
                     if ($invoiceId = $tenantService->addInvoice($invoice)) {
