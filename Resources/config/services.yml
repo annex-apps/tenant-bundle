@@ -45,11 +45,3 @@ services:
         arguments:
             - "@service_container"
             - "@doctrine.orm.entity_manager"
-
-    ## Basic services to get methods but not transform the returned data in any way
-    ## Common to all apps using this framework
-    brightpearl.contact:
-        class: Annex\TenantBundle\Services\Brightpearl\Contact
-        arguments:
-            - "@service_container"
-            - "@logger"
